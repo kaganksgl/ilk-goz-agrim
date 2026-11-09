@@ -127,9 +127,10 @@ class LocalModel:
 
         `reject_start` verilirse cevabın ilk `PREFIX_CHARS` karakteri gösterilmeden denetlenir; denetim
         reddederse cevap baştan üretilir (en çok `retries` kez). Denetim None dönerse (karar için daha fazla
-        metin gerekiyor) `MAX_PREFIX_CHARS` karaktere kadar beklenir. Son deneme her durumda gösterilir.
+        metin gerekiyor) `MAX_PREFIX_CHARS` karaktere kadar beklenir. Son deneme her durumda gösterilir; o da
+        reddedilirse ve selamlama ayrı bir paragrafsa (`STRIP_MAX_CHARS` içinde) yalnızca o paragraf atılır.
         """
-        from inference.answer_checks import MAX_PREFIX_CHARS, PREFIX_CHARS
+        from inference.answer_checks import MAX_PREFIX_CHARS, PREFIX_CHARS, STRIP_MAX_CHARS
 
         if self._llm is None:
             raise ModelNotLoadedError()
@@ -137,7 +138,7 @@ class LocalModel:
         try:
             while True:
                 stream = self._llm.stream(messages, settings)
-                held, released, retry = "", reject_start is None, False
+                held, released, retry, strip = "", reject_start is None, False, False
                 for text in stream:
                     if cancel is not None and cancel.is_set():
                         break
@@ -147,6 +148,16 @@ class LocalModel:
                         yield text
                         continue
                     held += text
+                    if strip:
+                        # Son deneme de reddedildi: selamlama ayrı bir paragrafsa onu atıp devamını göster.
+                        _, sep, rest = held.partition("\n\n")
+                        if sep and rest.strip():
+                            released = True
+                            yield rest.lstrip()
+                        elif len(held) >= STRIP_MAX_CHARS:
+                            released = True
+                            yield held
+                        continue
                     if len(held) >= PREFIX_CHARS:
                         verdict = reject_start(held)
                         if verdict is None and len(held) < MAX_PREFIX_CHARS:
@@ -154,14 +165,20 @@ class LocalModel:
                         if verdict and self.last_retries < retries:
                             retry = True
                             break
+                        if verdict:
+                            strip = True
+                            continue
                         released = True
                         yield held
                 close = getattr(stream, "close", None)
                 if callable(close):
                     close()  # yarıda bırakılan üretimi durdur
                 if not retry and not released and held:
+                    _, sep, rest = held.partition("\n\n")
+                    if strip:
+                        yield rest.lstrip() if sep and rest.strip() else held
                     # Cevap denetim eşiğinden kısa bitti: yine de denetle.
-                    if reject_start(held) and self.last_retries < retries and not (cancel and cancel.is_set()):
+                    elif reject_start(held) and self.last_retries < retries and not (cancel and cancel.is_set()):
                         retry = True
                     else:
                         yield held

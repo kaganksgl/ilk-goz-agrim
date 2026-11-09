@@ -137,3 +137,25 @@ def test_undecided_start_is_shown_after_max_prefix(fake_gguf):
     model = _model(fake, fake_gguf)
     assert "".join(model.stream_chat([], ModelSettings(), reject_start=bad_start)) == long_start
     assert len(fake.calls) == 1
+
+
+GREETING_PARAGRAPH = "Merhaba, ben bu uygulamanın yardımcı asistanıyım. Size destek olabilirim.\n\n" + GOOD
+
+
+def test_greeting_paragraph_is_dropped_when_retries_run_out(fake_gguf):
+    fake = SequenceFake([GREETING_PARAGRAPH])
+    model = _model(fake, fake_gguf)
+    assert "".join(model.stream_chat([], ModelSettings(), reject_start=bad_start, retries=2)) == GOOD
+    assert len(fake.calls) == 3
+
+
+def test_greeting_without_paragraph_break_is_still_shown(fake_gguf):
+    fake = SequenceFake([GREETING])
+    model = _model(fake, fake_gguf)
+    assert "".join(model.stream_chat([], ModelSettings(), reject_start=bad_start, retries=1)) == GREETING
+
+
+def test_bu_konuda_start():
+    # 10.11.2026: "Bebeğin göbeğine bozuk para bağlamak göbek fıtığını önler mi?" sorusunda kaçtı
+    assert bad_start("Bu konuda size yardımcı olamam. Benim uzmanlık alanım gebelik") is True
+    assert bad_start("Bu konuda bilinmesi gereken en önemli şey: göbeğe para bağlanmaz.") is False

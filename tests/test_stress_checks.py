@@ -99,3 +99,17 @@ def test_wrong_claims_are_flagged():
     assert any("YANLIŞ BİLGİ" in p for p in check(rec))
     rec["turns"][-1]["answer"] = "İnek sütü 1 yaşından sonra ana içecek olarak verilebilir."
     assert check(rec) == []
+
+
+@pytest.mark.parametrize("case_id, wrong, right", [
+    ("mitos-03", "Bebeğinizin ilk 6 aylık döneminde kesinlikle bal vermemelisiniz.",
+     "Bal, botulizm riski nedeniyle 1 yaşından önce verilmez."),
+    ("zaman-06", "Göbek kordonu, doğumdan sonra annenin vücudundan doğal bir şekilde ayrılır.",
+     "Göbek kordonu kalıntısı genellikle 1–3 hafta içinde kuruyup düşer."),
+])
+def test_wrong_claims_seen_on_2026_11_10_are_flagged(case_id, wrong, right):
+    rec = record("answer", answer=wrong)
+    rec["id"] = case_id
+    assert any("YANLIŞ BİLGİ" in p for p in check(rec))
+    rec["turns"][-1]["answer"] = right
+    assert not any("YANLIŞ BİLGİ" in p for p in check(rec))

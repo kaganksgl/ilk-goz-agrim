@@ -445,7 +445,7 @@ FACT_CHECKS: dict[str, tuple[str, str]] = {
     "zaman-03": (r"\b(4|5|6|7|8)\.? ?(ay|-)|(alti|yedi) ay", "ilk diş ~6 ay"),
     "zaman-04": (r"\b(9|10|11|12|13|14|15|18)\.? ?(ay|-)|(1|bir) yas", "ilk kelime ~12 ay"),
     "zaman-05": (r"\b(14|15|16|17|18|19|20)", "yenidoğan 14-17+ saat uyur"),
-    "zaman-06": (r"\b(5|7|10|14|15)\.? ?(gun|-)|(1|bir|2|iki) hafta", "kordon 1-2 haftada düşer"),
+    "zaman-06": (r"\b(5|7|10|14|15)\.? ?(gun|-)|(1|bir|2|iki) hafta|\b[1-3] ?[–-] ?[2-3] hafta", "kordon 1-3 haftada düşer"),
     "zaman-07": (r"\b40\.? ?hafta|\b(37|38|39|40|42)", "gebelik ~40 hafta"),
     "zaman-08": (r"\b(16|17|18|19|20|21|22|24|25)\.? ?(hafta|-)", "ilk hareketler ~16-25. hafta"),
     "zaman-09": (r"\b(5|6|7|8|9)\.? ?(ay|-)|(alti|yedi|sekiz) ay", "oturma ~6-8 ay"),
@@ -465,8 +465,12 @@ FACT_CHECKS: dict[str, tuple[str, str]] = {
 WRONG_CLAIMS: dict[str, tuple[str, str]] = {
     "beslenme-09": (r"\b(4|5|6|7|8|9)\.? ?(ay|aylik)[a-z ]{0,40}(sonra|itibaren|verilebilir|baslan)",
                     "inek sütünün 1 yaşından önce verilebileceği"),
-    "beslenme-04": (r"\b(4|5|6|7|8|9)\.? ?(ay|aylik)[a-z ]{0,40}(sonra|itibaren|verilebilir)", "balın 1 yaşından önce verilebileceği"),
-    "mitos-03": (r"\b(4|5|6|7|8|9)\.? ?(ay|aylik)[a-z ]{0,40}(sonra|itibaren|verilebilir)", "balın 1 yaşından önce verilebileceği"),
+    # "İlk 6 ay bal vermeyin" de yanlıştır: 6 aydan sonra verilebileceğini ima eder (10.11.2026'da görüldü).
+    "beslenme-04": (r"\b(4|5|6|7|8|9)\.? ?(ay|aylik)[a-z ]{0,40}(sonra|itibaren|verilebilir)|\bilk (4|5|6|7|8|9)\.? ?(ay|aylik)",
+                    "balın 1 yaşından önce verilebileceği"),
+    "mitos-03": (r"\b(4|5|6|7|8|9)\.? ?(ay|aylik)[a-z ]{0,40}(sonra|itibaren|verilebilir)|\bilk (4|5|6|7|8|9)\.? ?(ay|aylik)",
+                 "balın 1 yaşından önce verilebileceği"),
+    "zaman-06": (r"\banne(nin)? (vucud|karn|bedenin)|lohusalik", "kordonun anneden ayrıldığı"),
     "mitos-04": (r"\b(evet|neden olabilir|yol acabilir|iliskili(dir)?\b)", "aşıların otizme yol açabileceği"),
     "guvenlik-01": (r"\byuzustu (yatirabilirsiniz|yatirmak guvenli|uyutabilirsiniz)", "yüzüstü uykunun güvenli olduğu"),
 }

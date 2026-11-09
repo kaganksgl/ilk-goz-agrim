@@ -20,10 +20,13 @@ from safety.emergency import fold
 PREFIX_CHARS = 40
 # Şüpheli başlangıçta ilk cümle bitmediyse en çok bu kadar karakter beklenir; sonra cevap gösterilir.
 MAX_PREFIX_CHARS = 160
+# Tüm denemeler reddedilirse, selamlama paragrafının sonu bu kadar karakter içinde aranır (4. testte "Göbek
+# kordonu ne zaman düşer?" üç denemede de "Merhaba, ben…" paragrafıyla başladı, doğru cevap 2. paragraftaydı).
+STRIP_MAX_CHARS = 400
 
 _GREETING_START = re.compile(r"^\W*(merhaba|selam)\b")
 # Kendini tanıtma ya da kapsam reddiyle başlayabilecek cevaplar; ilk cümlenin tamamı denetlenir.
-_SUSPICIOUS_START = re.compile(r"^\W*(ben|bu benim|maalesef|uzgunum)\b")
+_SUSPICIOUS_START = re.compile(r"^\W*(ben|bu benim|bu konuda|maalesef|uzgunum)\b")
 _SELF_INTRO = re.compile(r"\basistan|\byapay zeka|\bben sadece\b")
 _SCOPE_REFUSAL = re.compile(
     r"\buzmanlik alan|\b(konularim|alanim)\w* disinda|\b(yardimci olamam|bilgi veremem|cevap veremem|cevaplayamam)"
