@@ -120,15 +120,16 @@ class LocalModel:
         messages: list[Message],
         settings: ModelSettings,
         cancel: threading.Event | None = None,
-        reject_start: Callable[[str], bool] | None = None,
+        reject_start: Callable[[str], bool | None] | None = None,
         retries: int = 2,
     ) -> Iterator[str]:
         """Cevabı parça parça üretir. `cancel` ayarlanırsa bir sonraki parçada durur.
 
         `reject_start` verilirse cevabın ilk `PREFIX_CHARS` karakteri gösterilmeden denetlenir; denetim
-        reddederse cevap baştan üretilir (en çok `retries` kez). Son deneme her durumda gösterilir.
+        reddederse cevap baştan üretilir (en çok `retries` kez). Denetim None dönerse (karar için daha fazla
+        metin gerekiyor) `MAX_PREFIX_CHARS` karaktere kadar beklenir. Son deneme her durumda gösterilir.
         """
-        from inference.answer_checks import PREFIX_CHARS
+        from inference.answer_checks import MAX_PREFIX_CHARS, PREFIX_CHARS
 
         if self._llm is None:
             raise ModelNotLoadedError()
@@ -147,7 +148,10 @@ class LocalModel:
                         continue
                     held += text
                     if len(held) >= PREFIX_CHARS:
-                        if reject_start(held) and self.last_retries < retries:
+                        verdict = reject_start(held)
+                        if verdict is None and len(held) < MAX_PREFIX_CHARS:
+                            continue
+                        if verdict and self.last_retries < retries:
                             retry = True
                             break
                         released = True

@@ -1,6 +1,6 @@
 import pytest
 
-from inference.answer_checks import greeting_rejector, starts_with_greeting, user_invites_greeting
+from inference.answer_checks import bad_start, start_rejector, user_invites_greeting
 from inference.engine import LocalModel
 from config.settings import ModelSettings
 from tests.conftest import FakeLlama
@@ -11,9 +11,14 @@ from tests.conftest import FakeLlama
     "Merhaba, ben senin yardımcı asistanınım.",
     "Ben 'İlk Göz Ağrım' uygulamasının yardımcı asistanıyım.",
     "  merhaba ben",
+    # 3. büyük testte kaçanlar: 'asistan' 40. karakterden sonra / konuyla ilgili soruya kapsam reddi
+    "Ben bir ebeveynlik ve bebek bakımı konusunda yardımcı asistanım. Kardeş kıskançlığı",
+    "Bu benim uzmanlık alanım değil. Ben anne adaylarına",
+    "Ben bir yapay zekâ asistanıyım ve tıbbi tavsiye veremem.",
+    "Maalesef bu konuda yardımcı olamam.",
 ])
 def test_greeting_starts_are_detected(prefix):
-    assert starts_with_greeting(prefix)
+    assert bad_start(prefix) is True
 
 
 @pytest.mark.parametrize("prefix", [
@@ -21,9 +26,24 @@ def test_greeting_starts_are_detected(prefix):
     "Hayır, bebeği banyoda asla yalnız bırakmayın.",
     "Bebeğinizi güvenli uyutmak için en önemli kural",
     "Ben de bu konuda şunu söyleyebilirim: bebekler",  # 'asistan' yok
+    "Bu benim de çok sık duyduğum bir soru. Bebekler",
+    "Kan tahlilinizdeki hemoglobin değeriyle ilgili bir yorum yapamam.",  # şüpheli başlangıç değil
 ])
 def test_normal_starts_are_accepted(prefix):
-    assert not starts_with_greeting(prefix)
+    assert bad_start(prefix) is False
+
+
+def test_undecided_start_waits_for_sentence_end():
+    assert bad_start("Ben bir ebeveynlik ve bebek bakımı konus") is None
+
+
+def test_scope_refusal_is_accepted_for_medication_and_lab_questions():
+    assert start_rejector("Emzirirken migren ilacı kullanabilir miyim?")("Maalesef bu konuda bilgi veremem.") is False
+    assert start_rejector("Parmak gıdalar nelerdir?")("Bu benim uzmanlık alanım değil.") is True
+    # Kendini tanıtma ilaç sorusunda da yeniden üretilir.
+    assert start_rejector("Emzirirken migren ilacı kullanabilir miyim?")("Ben bir yapay zekâ asistanıyım.") is True
+    # 'hap' yalnızca bütün kelime olarak: hapşırma sorusu ilaç sorusu değil
+    assert start_rejector("Bebeğim çok hapşırıyor, neden?")("Maalesef bu konuda yardımcı olamam.") is True
 
 
 @pytest.mark.parametrize("text, invites", [
@@ -45,7 +65,7 @@ def test_normal_starts_are_accepted(prefix):
 ])
 def test_user_invites_greeting(text, invites):
     assert user_invites_greeting(text) is invites
-    assert (greeting_rejector(text) is None) is invites
+    assert (start_rejector(text) is None) is invites
 
 
 class SequenceFake(FakeLlama):
@@ -75,7 +95,7 @@ GOOD = "Hayır, bebeği banyoda bir dakika bile olsa asla yalnız bırakmayın; 
 def test_greeting_answer_is_regenerated(fake_gguf):
     fake = SequenceFake([GREETING, GOOD])
     model = _model(fake, fake_gguf)
-    out = "".join(model.stream_chat([], ModelSettings(), reject_start=starts_with_greeting))
+    out = "".join(model.stream_chat([], ModelSettings(), reject_start=bad_start))
     assert out == GOOD
     assert model.last_retries == 1 and len(fake.calls) == 2
 
@@ -83,7 +103,7 @@ def test_greeting_answer_is_regenerated(fake_gguf):
 def test_retries_are_bounded_and_last_answer_is_shown(fake_gguf):
     fake = SequenceFake([GREETING])
     model = _model(fake, fake_gguf)
-    out = "".join(model.stream_chat([], ModelSettings(), reject_start=starts_with_greeting, retries=2))
+    out = "".join(model.stream_chat([], ModelSettings(), reject_start=bad_start, retries=2))
     assert out == GREETING  # sonsuz döngü yok; son deneme gösterilir
     assert len(fake.calls) == 3
 
@@ -91,11 +111,29 @@ def test_retries_are_bounded_and_last_answer_is_shown(fake_gguf):
 def test_short_greeting_answer_is_also_checked(fake_gguf):
     fake = SequenceFake(["Merhaba!", GOOD])
     model = _model(fake, fake_gguf)
-    assert "".join(model.stream_chat([], ModelSettings(), reject_start=starts_with_greeting)) == GOOD
+    assert "".join(model.stream_chat([], ModelSettings(), reject_start=bad_start)) == GOOD
 
 
 def test_without_check_stream_is_unchanged(fake_gguf):
     fake = SequenceFake([GREETING])
     model = _model(fake, fake_gguf)
     assert "".join(model.stream_chat([], ModelSettings())) == GREETING
+    assert len(fake.calls) == 1
+
+
+SELF_INTRO = "Ben bir ebeveynlik ve bebek bakımı konusunda yardımcı asistanım. Kardeş kıskançlığı gibi konularda bilgi verebilirim."
+
+
+def test_late_self_intro_is_regenerated(fake_gguf):
+    fake = SequenceFake([SELF_INTRO, GOOD])
+    model = _model(fake, fake_gguf)
+    assert "".join(model.stream_chat([], ModelSettings(), reject_start=bad_start)) == GOOD
+    assert model.last_retries == 1
+
+
+def test_undecided_start_is_shown_after_max_prefix(fake_gguf):
+    long_start = "Ben " + "çok " * 60 + "uzun bir cümleyle başlıyorum"
+    fake = SequenceFake([long_start])
+    model = _model(fake, fake_gguf)
+    assert "".join(model.stream_chat([], ModelSettings(), reject_start=bad_start)) == long_start
     assert len(fake.calls) == 1

@@ -12,7 +12,7 @@ import threading
 from PySide6.QtCore import QObject, Signal, Slot
 
 from config.settings import OFF_TOPIC_MESSAGE, ModelSettings
-from inference.answer_checks import greeting_rejector
+from inference.answer_checks import start_rejector
 from inference.engine import LocalModel, build_messages
 from inference.errors import InferenceError
 from inference.topic_guard import TopicGuard
@@ -80,7 +80,7 @@ class InferenceWorker(QObject):
             messages = build_messages(
                 self._settings.system_prompt, history, self._settings.max_history_messages
             )
-            reject = greeting_rejector(history[-1]["content"])
+            reject = start_rejector(history[-1]["content"])
             for text in self._model.stream_chat(messages, self._settings, self._cancel, reject_start=reject):
                 parts.append(text)
                 self.token_received.emit(text)
