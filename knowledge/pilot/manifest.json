@@ -1,0 +1,23 @@
+{
+  "built": "2026-10-27",
+  "app_commercial": false,
+  "approved_sources": [],
+  "license_verified_sources": [
+    "NIH-001",
+    "WHO-001",
+    "WHO-002",
+    "WHO-003",
+    "WHO-004",
+    "WHO-005",
+    "WHO-006"
+  ],
+  "chunk_count": 0,
+  "review_queue_count": 4,
+  "emergency_chunk_count": 0,
+  "notices": {
+    "WHO-001": "DSÖ'nün önerdiği atıf biçimi ve \"Lisans: CC BY-NC-SA 3.0 IGO\" ibaresi; DSÖ logosu kullanılamaz; DSÖ'nün onayladığı ima edilemez; uyarlamalar aynı veya eşdeğer CC lisansıyla lisanslanmalı; üçüncü taraf tablo/şekil/görseller lisans kapsamında değil"
+  },
+  "share_alike_sources": [
+    "WHO-001"
+  ]
+}

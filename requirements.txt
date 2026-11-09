@@ -1,0 +1,5 @@
+# Arayüz (LGPL-3.0)
+PySide6==6.12.0
+# Yerel GGUF çıkarımı, llama.cpp bağlamaları (MIT)
+# Windows'ta derleyici gerektirmemek için hazır CPU tekerleği kullanılır, bkz. README.
+llama-cpp-python==0.3.36
