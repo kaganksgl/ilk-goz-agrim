@@ -41,7 +41,41 @@ def _tidy_trailing_referral(text: str) -> str:
     return f"{body}\n\n{sentence[0].upper()}{sentence[1:]}."
 
 
+# Bilgi kartı notunun cevaba sızan kalıntıları (bkz. inference/answering.py). Model 12.11.2026 testinde 394
+# vakanın 25'inde "Bilgi notuna göre …", "Bilgi notu: …" yazdı, bir kez notu köşeli parantezle kopyaladı ve kart
+# olmayan sorularda "Bilgi notu yok" dedi.
+_NOTE_BLOCK = re.compile(r"\[[^\]]*(doğrulanmış bilgiler|Bilgi notu)[^\]]*\]\s*", re.IGNORECASE)
+_NOTE_SENTENCE = re.compile(
+    r"[^.!?\n]*\b(bilgi not(u|una|unda|unuz)|verilen (bilgiler|not)|doğrulanmış bilgi)\w*\s*(yok|bulunmuyor|bulunmamaktadır|"
+    r"verilmemiş|verilmedi)[^.!?\n]*[.!?]?\s*",
+    re.IGNORECASE,
+)
+_NOTE_LEAD = re.compile(
+    r"(?:(?:yukarıdaki |verilen )?bilgi not(?:unda|una|u)(?: göre| belirtildiği (?:gibi|üzere))?|"
+    r"(?:verilen|yukarıdaki) (?:doğrulanmış )?bilgilere göre)\s*[:,;]?\s*(\w?)",
+    re.IGNORECASE,
+)
+_SENTENCE_START = re.compile(r"(^|[.!?]\s+|\n\s*)$")
+
+
+def _upper_tr(ch: str) -> str:
+    return "İ" if ch == "i" else ch.upper()
+
+
+def remove_note_leaks(text: str) -> str:
+    text = _NOTE_BLOCK.sub("", text)
+    text = _NOTE_SENTENCE.sub("", text)
+
+    def lead(m: re.Match) -> str:
+        # Silinen giriş cümle başındaysa sonraki harf büyür: "Bilgi notuna göre, bebekler" → "Bebekler"
+        at_start = bool(_SENTENCE_START.search(text[: m.start()]))
+        return _upper_tr(m.group(1)) if at_start else m.group(1)
+
+    return _NOTE_LEAD.sub(lead, text).strip()
+
+
 def fix_text(text: str) -> str:
+    text = remove_note_leaks(text)
     for pattern, replacement in _FIXES:
         text = pattern.sub(replacement, text)
     return _tidy_trailing_referral(text)

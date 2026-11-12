@@ -112,7 +112,7 @@ def test_example_question_is_sent(qtbot, tmp_path, fake_gguf):
     w.example_buttons[1].click()
     qtbot.waitUntil(lambda: w.state == "ready", timeout=5000)
     assert w.bubbles()[0].text() == EXAMPLE_QUESTIONS[1]
-    assert fake.calls[0][0][-1]["content"] == EXAMPLE_QUESTIONS[1]
+    assert fake.calls[0][0][-1]["content"].endswith(EXAMPLE_QUESTIONS[1])
     w.close()
 
 
@@ -144,7 +144,12 @@ def test_relevant_question_passes_history_to_guard(qtbot, tmp_path, fake_gguf):
     assert "Son mesaj: Bebeğim kaç saat uyumalı?" in check_messages[-1]["content"]
     sent = fake.calls[0][0]
     assert sent[0]["role"] == "system" and "ilk çocukları" in sent[0]["content"]
-    assert sent[-1] == {"role": "user", "content": "Bebeğim kaç saat uyumalı?"}
+    # Soruya uyan bilgi kartı yalnızca modele giden son mesaja eklenir …
+    assert sent[-1]["role"] == "user" and sent[-1]["content"].endswith("Soru: Bebeğim kaç saat uyumalı?")
+    assert "doğrulanmış bilgiler" in sent[-1]["content"] and "14–17 saat" in sent[-1]["content"]
+    # … ekranda ve geçmişte kullanıcının yazdığı metin olduğu gibi kalır.
+    assert w.history[0] == {"role": "user", "content": "Bebeğim kaç saat uyumalı?"}
+    assert "doğrulanmış" not in w.bubbles()[0].text()
     assert w.bubbles()[-1].role == "assistant"
     w.close()
 

@@ -25,7 +25,8 @@ sys.path.insert(0, str(ROOT))
 
 from config.settings import ModelSettings, model_file  # noqa: E402
 from inference.answer_checks import start_rejector  # noqa: E402
-from inference.engine import LocalModel, build_messages  # noqa: E402
+from inference.answering import build_answer_messages, cards_for  # noqa: E402
+from inference.engine import LocalModel  # noqa: E402
 from inference.text_fixes import clean_answer  # noqa: E402
 from safety.dose import is_dose_request  # noqa: E402
 from inference.topic_guard import TopicGuard  # noqa: E402
@@ -64,7 +65,7 @@ def run_turn(model: LocalModel, guard: TopicGuard, settings: ModelSettings, hist
     first = None
     parts: list[str] = []
     try:
-        for chunk in model.stream_chat(build_messages(settings.system_prompt, candidate, settings.max_history_messages), settings,
+        for chunk in model.stream_chat(build_answer_messages(settings, candidate), settings,
                                        reject_start=start_rejector(text)):
             first = first or time.perf_counter()
             parts.append(chunk)
@@ -80,6 +81,7 @@ def run_turn(model: LocalModel, guard: TopicGuard, settings: ModelSettings, hist
         answer=answer,
         answer_raw=raw if raw != answer else None,
         retries=model.last_retries,
+        cards=[c.id for c in cards_for(candidate)] if settings.knowledge_cards_enabled else [],
         ttft_s=round((first or t2) - t1, 2),
         wait_s=round((first or t2) - t0, 2),
         tokens=tokens,
@@ -278,12 +280,15 @@ def main() -> int:
     parser.add_argument("--set", choices=sorted(SETS), default="1")
     parser.add_argument("--no-cache", action="store_true", help="KV önbelleğini kapat (karşılaştırma için)")
     parser.add_argument("--temperature", type=float, help="ör. 0 ile belirlenimci çalıştırma")
+    parser.add_argument("--no-cards", action="store_true", help="Bilgi kartlarını kapat (karşılaştırma için)")
     args = parser.parse_args()
     if args.analyze:
         return analyze(args.analyze)
     overrides = {}
     if args.no_cache:
         overrides["prompt_cache_mb"] = 0
+    if args.no_cards:
+        overrides["knowledge_cards_enabled"] = False
     if args.temperature is not None:
         overrides["temperature"] = args.temperature
     run(args.out, set(args.only) if args.only else None, SETS[args.set], overrides)

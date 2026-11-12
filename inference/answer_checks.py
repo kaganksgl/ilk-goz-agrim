@@ -26,10 +26,10 @@ STRIP_MAX_CHARS = 400
 
 _GREETING_START = re.compile(r"^\W*(merhaba|selam)\b")
 # Kendini tanıtma ya da kapsam reddiyle başlayabilecek cevaplar; ilk cümlenin tamamı denetlenir.
-_SUSPICIOUS_START = re.compile(r"^\W*(ben|bu benim|bu konuda|maalesef|uzgunum)\b")
+_SUSPICIOUS_START = re.compile(r"^\W*(ben|bu benim|bu konu(da|daki|yla)?|maalesef|uzgunum)\b")
 _SELF_INTRO = re.compile(r"\basistan|\byapay zeka|\bben sadece\b")
 _SCOPE_REFUSAL = re.compile(
-    r"\buzmanlik alan|\b(konularim|alanim)\w* disinda|\b(yardimci olamam|bilgi veremem|cevap veremem|cevaplayamam)"
+    r"\buzmanlik alan|\b(konularim|alanim)\w* disinda|\b(yardimci olam(am|iyorum)|bilgi verem(em|iyorum)|cevap verem(em|iyorum)|cevaplayam(am|iyorum))"
 )
 _SENTENCE_END = re.compile(r"[.!?:]")
 _USER_INVITES_GREETING = re.compile(

@@ -58,25 +58,15 @@ derleme araçları ve CMake gerekir.
 
 ### Model
 
-Uygulama açılışta modeli şu sırayla arar:
-
-1. `--model` komut satırı parametresi
-2. `ILK_GOZ_AGRIM_MODEL` ortam değişkeni
-3. Daha önce "Model seç…" ile seçilip kaydedilen yol
-4. `models/` dizinindeki alfabetik olarak ilk `.gguf` dosyası
-
-Model dosyaları depoya eklenmez. Ayrıntılar ve kullanılan dosyaların kaynakları/SHA256 değerleri:
-[models/README.md](models/README.md).
-
-**Varsayılan model: Gemma 4 E4B** (Google, resmi QAT q4_0, Apache-2.0, 5,2 GB, ~6 GB RAM).
-Beş adayın karşılaştırması ve seçim gerekçesi: [models/MODEL_SECIMI.md](models/MODEL_SECIMI.md).
-İndirme komutu ve SHA256: [models/README.md](models/README.md).
+Uygulama **tek bir modelle** çalışır: **Gemma 4 E4B** (Google, resmi QAT q4_0, Apache-2.0, 5,2 GB, ~6 GB RAM).
+Dosya `models/gemma-4-E4B_q4_0-it.gguf` olarak bulunmalıdır; model seçme düğmesi ya da parametresi yoktur.
+Dosya depoya eklenmez. İndirme komutu ve SHA256: [models/README.md](models/README.md). Seçimin gerekçesi
+(beş adayın karşılaştırması): [models/MODEL_SECIMI.md](models/MODEL_SECIMI.md).
 
 ## Çalıştırma
 
 ```powershell
 .venv\Scripts\python main.py
-.venv\Scripts\python main.py --model C:\yol\model.gguf
 ```
 
 ## Verilerin saklandığı yer
@@ -124,7 +114,9 @@ ui/
 knowledge/            Kaynak kaydı, lisans raporu, izin listesi ve bilgi tabanı giriş denetimi
                       (şu an onaylı kaynak yok; bkz. knowledge/README.md)
 tools/
-  benchmark_models.py Aday modelleri hız, bellek, konu denetimi ve cevap kalitesi için ölçer
+  stress_test.py      Büyük test: uygulamanın kendi akışıyla 394 vaka, otomatik doğruluk ve çekimserlik ölçümü
+  stress_prompts.py   Büyük testin vakaları (1–3. tur) ve doğruluk denetimleri
+  stress_direct.py    4. tur: net cevabı olan 102 soru
   eval_data.py        Etiketli Türkçe değerlendirme soruları
 tests/                Birim, arayüz ve gerçek modelli entegrasyon testleri
 models/               GGUF dosyaları (depoya eklenmez)
@@ -136,27 +128,14 @@ models/               GGUF dosyaları (depoya eklenmez)
 .venv\Scripts\python -m pytest                     # tümü
 .venv\Scripts\python -m pytest -m "not integration" # yalnızca hızlı testler (sahte model)
 .venv\Scripts\python -m pytest -m integration -s    # gerçek modelle
-
-# Entegrasyon testlerini belirli bir modelle çalıştırmak için:
-$env:ILK_GOZ_AGRIM_TEST_MODEL = "models\candidates\gemma-4-E4B_q4_0-it.gguf"
-.venv\Scripts\python -m pytest -m integration -s
 ```
 
 - Tüm testler Python seviyesindeki soket bağlantılarını engelleyen bir fikstürle çalışır; gerçek model
   testleri ağ erişimi olmadan geçmektedir.
 - Arayüz testleri ekransız (`QT_QPA_PLATFORM=offscreen`) çalışır.
 - Konu denetimi doğruluk testi: 24 etiketli soru, en az %90 doğruluk, yazılım soruları her zaman
-  reddedilmeli. Gemma 4 E4B ile 0 hata (0.5B test modeliyle atlanır).
+  reddedilmeli. Gemma 4 E4B ile 0 hata.
 - Son çalıştırma (27.10.2026, Gemma 4 E4B): **83 test geçti, 0 atlandı** (~90 sn).
-
-## Model karşılaştırması
-
-```powershell
-.venv\Scripts\python tools\benchmark_models.py models\candidates\*.gguf --out bench.json
-```
-
-Her model ayrı bir süreçte ölçülür: yükleme süresi, en yüksek bellek, konu denetimi doğruluğu ve süresi,
-kullanıcının ilk kelimeyi görene kadar beklediği süre, üretim hızı ve 7 Türkçe sorunun cevapları.
 
 ## Bağımlılıklar ve lisanslar
 
@@ -167,14 +146,13 @@ kullanıcının ilk kelimeyi görene kadar beklediği süre, üretim hızı ve 7
 | numpy, jinja2, diskcache | (llama-cpp-python bağımlılıkları) | BSD-3 / BSD-3 / Apache-2.0 | |
 | pytest, pytest-qt | 9.1.1, 4.5.0 | MIT | Yalnızca geliştirme |
 
-Model lisansları modele göre değişir: Qwen3.5 ve Gemma 4 Apache-2.0, YTÜ Cosmos Turkish-Gemma-9b-T1
-Gemma kullanım koşullarına tabidir. Her model ayrıca kontrol edilmelidir.
+Model: Gemma 4 E4B, Apache-2.0.
 
 ## Sorun giderme
 
 | Belirti | Çözüm |
 |---|---|
-| "Model bulunamadı" | `models/` içine bir `.gguf` koyun ya da "Model seç…" ile seçin |
-| "Seçilen dosya geçerli bir GGUF model dosyası değil" | Dosya eksik indirilmiş olabilir; SHA256 değerini [models/README.md](models/README.md) ile karşılaştırın |
+| "Model bulunamadı" | `models/gemma-4-E4B_q4_0-it.gguf` dosyasını indirip "Yeniden dene"ye basın ([models/README.md](models/README.md)) |
+| "Model dosyası geçerli bir GGUF dosyası değil" | Dosya eksik indirilmiş olabilir; SHA256 değerini [models/README.md](models/README.md) ile karşılaştırın |
 | "Model yüklenemedi" | Bellek yetersiz olabilir (Gemma 4 E4B ~6 GB RAM ister) veya model mimarisi bu llama-cpp-python sürümünde desteklenmiyor olabilir |
 | İlk kelime geç geliyor (8–18 sn) | CPU'da her turda konu denetimi + cevap istemi baştan hesaplanır; iyileştirme planı CHECKLIST.md'de |

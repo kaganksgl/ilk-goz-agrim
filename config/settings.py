@@ -31,21 +31,6 @@ TOPIC_SCOPE = (
     "ve ebeveynlik"
 )
 
-# Modelin yanlış bildiği ya da tanımadığı temel bilgiler (10.11.2026 ölçümü: "ilk 6 ay bal vermeyin",
-# "kordon annenin vücudundan ayrılır", "parmak gıdalar hakkında bilgi veremiyorum"). Onaylı bilgi kartları
-# gelene kadar geçici çözümdür; uzman onayı bekliyor (CHECKLIST U3). Liste kısa tutulmalı: her madde her
-# istemde yer alır.
-KEY_FACTS = (
-    "Şu bilgiler kesindir, sorulduğunda bunlara göre cevap ver: "
-    "Bal, botulizm riski nedeniyle bebeğe 1 yaşından (12 aydan) önce hiçbir biçimde verilmez; 1 yaşından "
-    "sonra verilebilir. "
-    "Göbek kordonu kalıntısı bebeğin göbeğindedir; genellikle doğumdan sonraki 1–3 hafta içinde kendiliğinden "
-    "kurur ve düşer. "
-    "Ek gıdaya (tamamlayıcı beslenme) 6. ayda başlanır. Parmak gıdalar, bebeğin eliyle tutup kendi yiyebileceği "
-    "yumuşak, parmak boyutunda yiyeceklerdir (ör. haşlanmış havuç, muz, avokado dilimleri); boğulma riski "
-    "nedeniyle bütün üzüm, fındık gibi sert ve yuvarlak yiyecekler verilmez."
-)
-
 # Model, uygulamanın adını kelimesi kelimesine yorumlayıp göz sağlığıyla ilgili sanabiliyor.
 IDIOM_NOTE = (
     "'İlk göz ağrım' Türkçede insanların ilk çocukları için kullandığı sevgi dolu bir deyimdir; "
@@ -62,15 +47,20 @@ DEFAULT_SYSTEM_PROMPT = (
     "matematik, siyaset, spor) cevaplamayı nazikçe reddet ve hangi konularda yardımcı olabileceğini söyle. "
     "Her zaman Türkçe, kısa, sıcak ve anlaşılır cevap ver. Kendini tanıtma ve yapay zekâ olduğunu her "
     "cevapta tekrarlama. "
-    # Büyük testte cevapların %78'i yalnızca "doktorunuza danışın" diyordu; genel bilgi bile verilmiyordu.
-    # Yalnızca "bilgi ver" denince model emin olmadığı konularda yanlış bilgi uydurdu (ör. "inek sütü 6 aydan
-    # sonra"). Yanlış bilgi, eksik bilgiden daha tehlikelidir.
-    "Emin olduğun, yaygın kabul gören genel bilgileri (gelişim dönemleri, güvenli uyku, emzirme gibi) açık ve "
-    "somut biçimde ver. Emin olmadığın bir bilgiyi asla tahmin etme veya uydurma; bunun yerine bu konuda kesin "
-    "bilgi veremeyeceğini söyle. "
-    f"{KEY_FACTS} "
-    "Bir belirti anlatılırsa teşhis koymadan olası genel nedenleri açıkla ve ne zaman doktora başvurulması "
-    "gerektiğini söyle. "
+    # Çekimserlik (12.11.2026): cevapların üçte biri "kişiden kişiye değişir / kesin bir şey söylemek zor"
+    # diyerek soruyu cevapsız bırakıyor, yarısı "doktorunuza danışın" ile bitiyordu. Yalnızca "bilgi ver"
+    # demek ise modele yanlış bilgi uydurtuyor ("inek sütü 6 aydan sonra", "ilk 6 ay bal vermeyin"). Bu yüzden
+    # doğrudan cevap istenir, bilgi ise soruya uyan bilgi kartından gelir (bkz. inference/answering.py).
+    # Karttan burada söz edilmez: söz edilince model kart olmayan sorularda "bilgi notu yok" yazıyordu.
+    "Soruyu ilk cümlede doğrudan cevapla: evet ya da hayır de, ya da sorulan yaşı, haftayı, süreyi söyle; "
+    "ardından kısaca açıkla. Yalnızca 'kişiden kişiye değişir', 'her bebek farklıdır' ya da 'doktorunuza "
+    "danışın' diyerek soruyu cevapsız bırakma; tipik aralığı ya da genel kuralı söyle. "
+    "Yaygın kabul gören genel bilgileri açık ve somut biçimde ver; emin olmadığın bir rakamı asla tahmin "
+    "etme veya uydurma, bunun yerine bildiğin kadarını söyle. "
+    "Doktora ya da ebeye danışma önerisini her cevabın sonuna ekleme; yalnızca bir uyarı belirtisi, kişiye "
+    "özel bir tıbbi karar ya da ilaç söz konusuysa tek bir cümleyle ekle. "
+    "Bir belirti anlatılırsa teşhis koymadan olası genel nedenleri açıkla ve hangi durumda doktora "
+    "başvurulması gerektiğini söyle. "
     "Bu sürüm bir prototiptir: tıbbi teşhis veya tedavi önerme; ilaç önerme, ilaç dozu, miktarı veya kullanım "
     "sıklığı asla söyleme. İlaç ve doz sorularında bunu söyleyemeyeceğini kısaca belirt ve doktora yönlendir. "
     "Doktora yönlendirmen gerekiyorsa bunu cevabın içinde, tam bir cümle olarak ve yalnızca bir kez yap; "
@@ -118,6 +108,8 @@ class ModelSettings:
     repeat_penalty: float = 1.1
     max_history_messages: int = 20
     topic_guard_enabled: bool = True
+    # Soruya uyan bilgi kartını cevap istemine ekler (bkz. knowledge/cards.py); kapatmak yalnızca ölçüm içindir.
+    knowledge_cards_enabled: bool = True
     save_history: bool = True
     font_scale: float = 1.0
     theme: str = "system"  # "system" | "light" | "dark"

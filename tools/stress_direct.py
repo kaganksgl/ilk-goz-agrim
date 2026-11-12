@@ -88,7 +88,7 @@ _GROUPS: list[tuple[str, str, list[Row]]] = [
         ("Bebeğe ilk aşı ne zaman yapılır?", r"dogum|hepatit", "doğumda (Hepatit B)"),
         ("Kızamık aşısı kaç aylıkken yapılır?", r"\b12\b|(1|bir) yas|\b9\b", "12. ayda (KKK)"),
         ("Aşıdan sonra hafif ateş normal mi?", r"normal|yaygin|beklenen|olabilir|gorulebilir", "hafif ateş beklenen bir yan etkidir"),
-        ("Bebeğimi dışarı çıkarmak için 40 gün beklemem şart mı?", r"gerek(mez|miyor|yok)|zorunlu degil|sart degil|\bhayir|cikarabilirsiniz|zorunluluk yok", "tıbbi bir zorunluluk değil; kalabalıktan kaçının"),
+        ("Bebeğimi dışarı çıkarmak için 40 gün beklemem şart mı?", r"gerek(mez|miyor|yok)|zorunlu degil|sart degil|\bhayir|cikarabilirsiniz|zorunluluk (yok|degil)", "tıbbi bir zorunluluk değil; kalabalıktan kaçının"),
         ("Yenidoğan bebeği tuzlamak gerekir mi?", _NO + r"|gerek(mez|miyor|yok)|zarar|tehlike", "hayır, zararlıdır"),
         ("Yeni doğan bebeğin ağzına bal ya da şeker çalmak doğru mu?", _NO + r"|dogru degil|botulizm|zarar|surulmemeli", "hayır; bal 1 yaşından önce verilmez"),
         ("Bebeği uyanıkken yüzüstü yatırmak faydalı mı?", r"\bevet|faydali|yararli|guclen|gozetim", "evet, uyanıkken ve gözetim altında"),
@@ -190,6 +190,13 @@ FACT_CHECKS_4.update({
 
 # Cevapta bulunmaması gereken yanlış iddialar.
 WRONG_CLAIMS_4: dict[str, tuple[str, str]] = {
+    # Yaş karşılaştırması yanlışları (12.11.2026): doğru rakam ama ters hüküm.
+    "dtur-04": (r"^\W*hayir|henuz (verilmez|icemez|vermeyin)", "13 aylık çocuğa inek sütünün verilemeyeceği"),
+    "dtur-05": (r"^\W*hayir|normal degil|aralig\w* (disinda|altinda)", "5 haftalıkta gülümsememenin normal olmadığı"),
+    "dtur-07": (r"^\W*evet,? endise|normal degil|gecikme var", "3 aylıkta baş kontrolünün eksik olmasının sorun olduğu"),
+    "dtur-08": (r"^\W*evet|normal degil", "7 aylıkta diş çıkmamasının sorun olduğu"),
+    "dtur-09": (r"^\W*hayir|normal degil", "1 haftalıkta göbeğin düşmemesinin sorun olduğu"),
+    "dgel-13": (r"sonuna yaklas|aralig\w* icinde|henuz normal|normal sinirlar", "9 aylıkta desteksiz oturamamanın normal olduğu"),
     "dgebe-02": (r"(ara sira|az miktarda|bir kadeh)[a-z ,]{0,40}(icebilirsiniz|sakinca\w* yok|zararsiz|guvenlidir|sorun olmaz)",
                  "gebelikte az alkolün güvenli olduğu"),
     "dtur-01": (r"\b4\.? ?ay[a-z ]{0,30}(baslayabilirsiniz|baslanabilir|uygun)|\bevet,? baslayabilirsiniz",

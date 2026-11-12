@@ -13,7 +13,8 @@ from PySide6.QtCore import QObject, Signal, Slot
 
 from config.settings import OFF_TOPIC_MESSAGE, ModelSettings
 from inference.answer_checks import start_rejector
-from inference.engine import LocalModel, build_messages
+from inference.answering import build_answer_messages
+from inference.engine import LocalModel
 from inference.errors import InferenceError
 from inference.topic_guard import TopicGuard
 from inference.warmup import warm_up_prompts
@@ -77,9 +78,7 @@ class InferenceWorker(QObject):
                     self.generation_finished.emit("", True)
                     return
             self.answer_started.emit()
-            messages = build_messages(
-                self._settings.system_prompt, history, self._settings.max_history_messages
-            )
+            messages = build_answer_messages(self._settings, history)
             reject = start_rejector(history[-1]["content"])
             for text in self._model.stream_chat(messages, self._settings, self._cancel, reject_start=reject):
                 parts.append(text)
