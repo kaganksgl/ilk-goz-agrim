@@ -25,7 +25,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from config.settings import ModelSettings, resolve_model_path  # noqa: E402
+from config.settings import ModelSettings, model_file  # noqa: E402
 from inference.engine import LocalModel, build_messages  # noqa: E402
 from inference.topic_guard import TopicGuard  # noqa: E402
 from inference.warmup import warm_up_prompts  # noqa: E402
@@ -53,7 +53,7 @@ def run(config: dict, max_tokens: int) -> dict:
     )
     model = LocalModel()
     t = time.perf_counter()
-    model.load(resolve_model_path(ModelSettings()), settings)
+    model.load(model_file(), settings)
     load_s = time.perf_counter() - t
     warm_s = None
     if config.get("_warm"):

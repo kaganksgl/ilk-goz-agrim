@@ -19,17 +19,19 @@ class InferenceError(Exception):
 
 class ModelNotConfiguredError(InferenceError):
     user_message = (
-        "Model bulunamadı. 'models' klasörüne bir .gguf model dosyası koyun "
-        "veya 'Model seç…' düğmesiyle bir dosya seçin."
+        "Model bulunamadı. Model dosyasını 'models' klasörüne koyup 'Yeniden dene' düğmesine basın."
     )
 
 
 class ModelNotFoundError(InferenceError):
-    user_message = "Seçilen model dosyası bulunamadı."
+    user_message = (
+        "Model dosyası bulunamadı. Dosyayı 'models' klasörüne koyup 'Yeniden dene' düğmesine basın "
+        "(indirme adımları: models/README.md)."
+    )
 
 
 class InvalidModelFileError(InferenceError):
-    user_message = "Seçilen dosya geçerli bir GGUF model dosyası değil."
+    user_message = "Model dosyası geçerli bir GGUF dosyası değil; eksik indirilmiş olabilir."
 
 
 class BackendUnavailableError(InferenceError):

@@ -1,6 +1,6 @@
 """Gerçek bir GGUF modeliyle uçtan uca testler.
 
-`models/` dizininde (veya ILK_GOZ_AGRIM_TEST_MODEL ile belirtilen yolda) model yoksa atlanır.
+`models/` dizininde model dosyası yoksa atlanır.
 conftest'teki `no_network` fikstürü sayesinde bu testler ağ erişimi olmadan çalışır.
 """
 
@@ -97,13 +97,6 @@ def test_real_topic_guard_returns_valid_labels(loaded_model):
         assert guard.is_relevant([{"role": "user", "content": text}]) in (True, False)
 
 
-needs_capable_model = pytest.mark.skipif(
-    MODEL is not None and "0.5b" in MODEL.name.lower(),
-    reason="0.5B test modeli konu denetimi için yeterli değil; doğruluk seçilen modelle ölçülür",
-)
-
-
-@needs_capable_model
 def test_real_topic_guard_accuracy(loaded_model):
     from inference.topic_guard import TopicGuard
     from tools.eval_data import TOPIC_CASES
@@ -119,7 +112,6 @@ def test_real_topic_guard_accuracy(loaded_model):
     assert len(wrong) / len(TOPIC_CASES) <= 0.10
 
 
-@needs_capable_model
 def test_real_gui_refuses_software_question(qtbot, tmp_path):
     window = MainWindow(settings=SETTINGS, model=LocalModel(), initial_model_path=MODEL)
     qtbot.addWidget(window)

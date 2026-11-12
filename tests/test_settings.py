@@ -1,11 +1,11 @@
-from pathlib import Path
-
 from config.settings import (
+    DEFAULT_MODEL_DIR,
     DEFAULT_SYSTEM_PROMPT,
+    MODEL_FILENAME,
     TOPIC_CHECK_PROMPT,
     ModelSettings,
     load_settings,
-    resolve_model_path,
+    model_file,
     save_settings,
 )
 
@@ -14,9 +14,9 @@ def test_missing_file_gives_defaults(tmp_path):
     assert load_settings(tmp_path / "yok.json") == ModelSettings()
 
 
-def test_roundtrip_keeps_turkish_text(tmp_path):
+def test_roundtrip(tmp_path):
     path = tmp_path / "s.json"
-    original = ModelSettings(model_path="C:/modeller/ağrı.gguf", n_ctx=2048, topic_guard_enabled=False)
+    original = ModelSettings(n_ctx=2048, topic_guard_enabled=False)
     save_settings(original, path)
     assert load_settings(path) == original
 
@@ -48,30 +48,15 @@ def test_corrupt_file_gives_defaults(tmp_path):
     assert load_settings(path) == ModelSettings()
 
 
-def test_resolve_priority(tmp_path, monkeypatch):
-    model_dir = tmp_path / "models"
-    model_dir.mkdir()
-    (model_dir / "b.gguf").write_bytes(b"GGUF")
-    (model_dir / "a.gguf").write_bytes(b"GGUF")
-
-    saved = tmp_path / "secilen.gguf"
-    saved.write_bytes(b"GGUF")
-
-    assert resolve_model_path(ModelSettings(), model_dir) == model_dir / "a.gguf"
-    assert resolve_model_path(ModelSettings(model_path=str(saved)), model_dir) == saved
-    monkeypatch.setenv("ILK_GOZ_AGRIM_MODEL", "env.gguf")
-    assert resolve_model_path(ModelSettings(model_path=str(saved)), model_dir) == Path("env.gguf")
+def test_single_model_file(tmp_path):
+    assert model_file(tmp_path) == tmp_path / MODEL_FILENAME
+    assert model_file().parent == DEFAULT_MODEL_DIR
+    assert MODEL_FILENAME.endswith(".gguf")
 
 
-def test_stale_saved_path_falls_back_to_model_dir(tmp_path):
-    model_dir = tmp_path / "models"
-    model_dir.mkdir()
-    (model_dir / "yeni.gguf").write_bytes(b"GGUF")
-    stale = ModelSettings(model_path=str(tmp_path / "tasindi.gguf"))
-    assert resolve_model_path(stale, model_dir) == model_dir / "yeni.gguf"
-    # Dizinde de model yoksa kayıtlı yol döner; yükleme açık bir "bulunamadı" hatası verir.
-    assert resolve_model_path(stale, tmp_path / "bos") == tmp_path / "tasindi.gguf"
-
-
-def test_resolve_none_when_no_model(tmp_path):
-    assert resolve_model_path(ModelSettings(), tmp_path / "bos") is None
+def test_old_settings_file_with_model_path_is_ignored(tmp_path):
+    # Eski sürümler seçilen model yolunu kaydediyordu; artık tek model var ve bu alan yok sayılır.
+    path = tmp_path / "s.json"
+    path.write_text('{"model_path": "C:/eski/baska-model.gguf", "n_ctx": 2048}', encoding="utf-8")
+    loaded = load_settings(path)
+    assert loaded.n_ctx == 2048 and not hasattr(loaded, "model_path")

@@ -57,6 +57,19 @@ def test_missing_file_reports_error(qtbot, tmp_path):
     w.close()
 
 
+def test_retry_loads_model_once_file_is_in_place(qtbot, tmp_path):
+    # Tek model: dosya seçilemez; kullanıcı dosyayı yerine koyup "Yeniden dene"ye basar.
+    path = tmp_path / "model.gguf"
+    w = make_window(qtbot, tmp_path, factory=lambda p, s: FakeLlama(), model_path=path)
+    qtbot.waitUntil(lambda: w.state == "error", timeout=5000)
+    assert w.retry_button.isEnabled() and not hasattr(w, "choose_button")
+    path.write_bytes(b"GGUF" + b"\x00" * 64)
+    w.retry_button.click()
+    qtbot.waitUntil(lambda: w.state == "ready", timeout=5000)
+    assert w.notice.isHidden()
+    w.close()
+
+
 def test_load_error_reports_error(qtbot, tmp_path, fake_gguf):
     def boom(_p, _s):
         raise RuntimeError("bozuk dosya")
@@ -72,7 +85,6 @@ def test_successful_load_hides_notice_and_names_model(qtbot, tmp_path, fake_gguf
     w, _ = ready_window(qtbot, tmp_path, fake_gguf)
     assert w.notice.isHidden()
     assert "fake" in w.status_label.text()
-    assert load_settings(tmp_path / "settings.json").model_path == str(fake_gguf)
     w.close()
 
 

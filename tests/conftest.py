@@ -10,7 +10,7 @@ import pytest
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from config.settings import DEFAULT_MODEL_DIR  # noqa: E402
+from config.settings import model_file  # noqa: E402
 
 
 class NetworkAccessError(AssertionError):
@@ -32,17 +32,13 @@ def no_network(monkeypatch):
 
 @pytest.fixture(autouse=True)
 def isolated_env(monkeypatch, tmp_path):
-    """Testler kullanıcının gerçek ayarlarına ve model yolu değişkenine dokunmasın."""
+    """Testler kullanıcının gerçek ayarlarına dokunmasın."""
     monkeypatch.setenv("ILK_GOZ_AGRIM_DATA_DIR", str(tmp_path / "appdata"))
-    monkeypatch.delenv("ILK_GOZ_AGRIM_MODEL", raising=False)
 
 
 def real_model_path() -> Path | None:
-    env = os.environ.get("ILK_GOZ_AGRIM_TEST_MODEL")
-    if env:
-        return Path(env)
-    candidates = sorted(DEFAULT_MODEL_DIR.glob("*.gguf"))
-    return candidates[0] if candidates else None
+    path = model_file()
+    return path if path.is_file() else None
 
 
 class FakeLlama:

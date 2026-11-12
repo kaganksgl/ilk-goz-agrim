@@ -5,7 +5,3 @@ __pycache__/
 models/*
 !models/README.md
 !models/MODEL_SECIMI.md
-!models/candidates/
-models/candidates/*
-!models/candidates/sources.tsv
-bench*.json

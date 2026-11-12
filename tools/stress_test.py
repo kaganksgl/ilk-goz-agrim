@@ -23,7 +23,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from config.settings import ModelSettings, resolve_model_path  # noqa: E402
+from config.settings import ModelSettings, model_file  # noqa: E402
 from inference.answer_checks import start_rejector  # noqa: E402
 from inference.engine import LocalModel, build_messages  # noqa: E402
 from inference.text_fixes import clean_answer  # noqa: E402
@@ -96,7 +96,7 @@ def run(out: Path, only: set[str] | None, cases: list, overrides: dict | None = 
         done = {json.loads(line)["id"] for line in out.read_text(encoding="utf-8").splitlines() if line.strip()}
     settings = replace(ModelSettings(), **(overrides or {}))
     model = LocalModel()
-    model.load(resolve_model_path(settings), settings)
+    model.load(model_file(), settings)
     model.warm_up(warm_up_prompts(settings))  # uygulamadaki gibi
     guard = TopicGuard(model)
     cache = model._llm._llm.cache

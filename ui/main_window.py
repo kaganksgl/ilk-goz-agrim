@@ -9,7 +9,6 @@ from PySide6.QtCore import Qt, QThread, Signal
 from PySide6.QtGui import QKeySequence, QShortcut
 from PySide6.QtWidgets import (
     QApplication,
-    QFileDialog,
     QFrame,
     QHBoxLayout,
     QLabel,
@@ -25,7 +24,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from config.settings import APP_NAME, DEFAULT_MODEL_DIR, ModelSettings, save_settings
+from config.settings import APP_NAME, ModelSettings, save_settings
 from inference.engine import LocalModel
 from inference.errors import ModelNotConfiguredError, ModelNotLoadedError
 from inference.text_fixes import clean_answer
@@ -89,6 +88,7 @@ class MainWindow(QMainWindow):
         self.history: list[dict[str, str]] = []
         self.state = "not_loaded"
         self.model_path: str | None = None
+        self._model_file = initial_model_path
         self._current_bubble: MessageBubble | None = None
 
         self.setWindowTitle(APP_NAME)
@@ -159,10 +159,6 @@ class MainWindow(QMainWindow):
         h.addWidget(self.status_dot)
         h.addWidget(self.status_label)
         h.addSpacing(8)
-        self.choose_button = QPushButton("Model seç…", objectName="secondaryButton")
-        self.choose_button.setAccessibleName("Model dosyası seç")
-        self.choose_button.clicked.connect(self._choose_model)
-        h.addWidget(self.choose_button)
         self.settings_button = QPushButton("Ayarlar", objectName="secondaryButton")
         self.settings_button.setAccessibleName("Ayarları aç")
         self.settings_button.setToolTip("Ayarlar (Ctrl+,)")
@@ -222,9 +218,10 @@ class MainWindow(QMainWindow):
         self.notice_label.setAccessibleName("Model uyarısı")
         self.notice_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
         n.addWidget(self.notice_label, 1)
-        notice_button = QPushButton("Model seç…", objectName="secondaryButton")
-        notice_button.clicked.connect(self._choose_model)
-        n.addWidget(notice_button)
+        self.retry_button = QPushButton("Yeniden dene", objectName="secondaryButton")
+        self.retry_button.setAccessibleName("Modeli yeniden yüklemeyi dene")
+        self.retry_button.clicked.connect(self._retry_load)
+        n.addWidget(self.retry_button)
         self.notice.hide()
         body.addWidget(self.notice)
 
@@ -326,7 +323,7 @@ class MainWindow(QMainWindow):
         # Model hazır değilken de gönderilebilir: acil durum uyarısı modelden bağımsız çalışır.
         self.send_button.setEnabled(self.state != "generating" and has_text)
         self.stop_button.setEnabled(self.state == "generating")
-        self.choose_button.setEnabled(not busy)
+        self.retry_button.setEnabled(not busy and self._model_file is not None)
         self.settings_button.setEnabled(not busy)
         self.new_chat_button.setEnabled(self.state != "generating")
         self.conversation_list.setEnabled(self.state != "generating")
@@ -528,13 +525,10 @@ class MainWindow(QMainWindow):
         self._set_state("loading")
         self.request_load.emit(Path(path))
 
-    def _choose_model(self) -> None:
-        if self.state in ("loading", "generating"):
+    def _retry_load(self) -> None:
+        if self.state in ("loading", "generating") or self._model_file is None:
             return
-        start_dir = str(DEFAULT_MODEL_DIR if DEFAULT_MODEL_DIR.is_dir() else Path.home())
-        path, _ = QFileDialog.getOpenFileName(self, "GGUF model dosyası seç", start_dir, "GGUF modeli (*.gguf)")
-        if path:
-            self.load_model(path)
+        self.load_model(self._model_file)
 
     def _on_load_started(self, path: str) -> None:
         self.hide_notice()
@@ -544,9 +538,6 @@ class MainWindow(QMainWindow):
         self.hide_notice()
         self.model_path = path
         self._set_state("ready", path)
-        if self.settings_path is not None:
-            self.settings = replace(self.settings, model_path=path)
-            self._persist_settings()
         self.input.setFocus()
 
     def _on_load_failed(self, message: str, detail: str) -> None:

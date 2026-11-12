@@ -19,7 +19,10 @@ APP_ID = "IlkGozAgrim"
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_MODEL_DIR = PROJECT_ROOT / "models"
-MODEL_PATH_ENV = "ILK_GOZ_AGRIM_MODEL"
+# Uygulama tek bir modelle geliştirilir ve test edilir (bkz. models/MODEL_SECIMI.md); talimatlar, güvenlik
+# katmanları ve ölçümler bu modele göre ayarlıdır. Başka bir model seçilemez.
+MODEL_NAME = "Gemma 4 E4B"
+MODEL_FILENAME = "gemma-4-E4B_q4_0-it.gguf"
 DATA_DIR_ENV = "ILK_GOZ_AGRIM_DATA_DIR"
 
 TOPIC_SCOPE = (
@@ -100,7 +103,6 @@ _NOT_PERSISTED = {"system_prompt"}
 
 @dataclass
 class ModelSettings:
-    model_path: str | None = None
     n_ctx: int = 4096
     n_threads: int | None = None  # üretim; None: llama-cpp-python seçer (çekirdek sayısının yarısı)
     n_threads_batch: int | None = None  # istem işleme; None: tüm çekirdekler
@@ -161,24 +163,6 @@ def save_settings(settings: ModelSettings, path: Path | None = None) -> None:
     tmp.replace(path)
 
 
-def resolve_model_path(settings: ModelSettings, model_dir: Path = DEFAULT_MODEL_DIR) -> Path | None:
-    """Kullanılacak model dosyasını bulur.
-
-    Öncelik: ortam değişkeni > kayıtlı ayar > model dizinindeki ilk .gguf dosyası.
-    Kayıtlı yol artık yoksa (ör. model dosyası taşındıysa) model dizinine düşülür; orada da model
-    yoksa kayıtlı yol döner ve yükleme sırasında "bulunamadı" hatası gösterilir.
-    Hiçbiri yoksa None döner.
-    """
-    env = os.environ.get(MODEL_PATH_ENV)
-    if env:
-        return Path(env)
-    saved = Path(settings.model_path) if settings.model_path else None
-    if saved is not None and saved.is_file():
-        return saved
-    if model_dir.is_dir():
-        candidates = sorted(model_dir.glob("*.gguf"))
-        if candidates:
-            if saved is not None:
-                log.warning("Kayıtlı model bulunamadı (%s); %s kullanılıyor", saved, candidates[0])
-            return candidates[0]
-    return saved
+def model_file(model_dir: Path = DEFAULT_MODEL_DIR) -> Path:
+    """Uygulamanın kullandığı tek model dosyasının yolu (dosya yoksa yükleme açık bir hata verir)."""
+    return model_dir / MODEL_FILENAME
