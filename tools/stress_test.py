@@ -31,9 +31,9 @@ from safety.dose import is_dose_request  # noqa: E402
 from inference.topic_guard import TopicGuard  # noqa: E402
 from inference.warmup import warm_up_prompts  # noqa: E402
 from safety.emergency import detect, fold  # noqa: E402
-from tools.stress_prompts import FACT_CHECKS, ROUND1, ROUND2, ROUND3, WRONG_CLAIMS  # noqa: E402
+from tools.stress_prompts import FACT_CHECKS, ROUND1, ROUND2, ROUND3, ROUND4, WRONG_CLAIMS  # noqa: E402
 
-SETS = {"1": ROUND1, "2": ROUND2, "3": ROUND3, "all": ROUND1 + ROUND2 + ROUND3}
+SETS = {"1": ROUND1, "2": ROUND2, "3": ROUND3, "4": ROUND4, "all": ROUND1 + ROUND2 + ROUND3 + ROUND4}
 
 
 def run_turn(model: LocalModel, guard: TopicGuard, settings: ModelSettings, history: list[dict], text: str) -> dict:
@@ -133,6 +133,42 @@ _TURKISH_HINT = re.compile(r"[çğıöşüÇĞİÖŞÜ]")
 _ENGLISH_WORDS = re.compile(r"\b(the|and|is|are|you|your|baby|with)\b", re.I)
 
 
+# ---- çekimserlik ölçümü -----------------------------------------------------------
+# Cevap soruyu karşılamadan geçiştiriyorsa "kaçamak" sayılır. Başarısızlık değil, ölçümdür: bazı sorularda
+# (teşhis, ilaç) geri durmak doğrudur. Oranı sürümler arasında karşılaştırmak için kullanılır.
+_REFUSAL = re.compile(r"yardimci olam|bilgi verem|cevap verem|cevaplayam|yorum yapam|uzmanlik alanim")
+_HEDGE = re.compile(
+    r"kesin (bir )?(bilgi|sey|sure|yas|zaman|rakam|miktar|tarih|kural)[a-z ]{0,30}(verem|vermek (zor|mumkun degil)|soylem|yok)"
+    r"|net (bir )?(tarih|sure|yas|rakam)[a-z ]{0,20}verem"
+    r"|genel bir (yas|kural|sure)[a-z ]{0,25}(vermek zor|olmamakla|yok)"
+    r"|(kisiden kisiye|bebekten bebege|cocuktan cocuga|anneden anneye)[a-z ]{0,15}(degis|fark)"
+    r"|her (bebek|cocuk|gebelik|kadin|anne)[a-z ]{0,25}(farkli|degis)"
+)
+_REFERRAL = re.compile(
+    r"(doktor|eben|hekim|uzman|saglik (profesyonel|personel|kurulus))[a-z]{0,14}[^.!?]{0,60}"
+    r"(danis|basvur|gorus|konus|sorun|degerlendir)"
+)
+_SHORT_ANSWER_CHARS = 200
+
+
+def refers_to_doctor(answer: str) -> bool:
+    return bool(_REFERRAL.search(fold(answer)))
+
+
+def evasion(answer: str) -> str | None:
+    """Cevap kaçamaksa türünü ("ret", "genelleme", "yalnızca yönlendirme"), değilse None döndürür."""
+    folded = fold(answer)
+    if _REFUSAL.search(folded):
+        return "ret"
+    if re.search(r"\d", folded):
+        return None  # somut bir sayı (yaş, hafta, derece) içeren cevap kaçamak değildir
+    if _HEDGE.search(folded):
+        return "genelleme"
+    if _REFERRAL.search(folded) and len(answer) < _SHORT_ANSWER_CHARS:
+        return "yalnızca yönlendirme"
+    return None
+
+
 def check(record: dict) -> list[str]:
     """Kayıttaki son tura göre bulunan sorunlar."""
     problems = []
@@ -177,6 +213,37 @@ def check(record: dict) -> list[str]:
     return problems
 
 
+def quality(records: list[dict]) -> dict:
+    """Cevap beklenen vakalarda doğruluk ve çekimserlik ölçümleri."""
+    answers = [(r, r["turns"][-1]) for r in records if r["expect"] == "answer" and r["turns"][-1]["layer"] == "answered"]
+    facts = [(r, t) for r, t in answers if r["id"] in FACT_CHECKS]
+    evasive = [(r["id"], kind) for r, t in answers if (kind := evasion(t["answer"]))]
+    return {
+        "answers": len(answers),
+        "facts": len(facts),
+        "facts_ok": sum(bool(re.search(FACT_CHECKS[r["id"]][0], fold(t["answer"]))) for r, t in facts),
+        "wrong": sum(any("YANLIŞ BİLGİ" in p for p in check(r)) for r in records),
+        "evasive": evasive,
+        "referrals": sum(refers_to_doctor(t["answer"]) for _, t in answers),
+        "median_chars": sorted(len(t["answer"]) for _, t in answers)[len(answers) // 2] if answers else 0,
+    }
+
+
+def print_quality(records: list[dict]) -> None:
+    q = quality(records)
+    if not q["answers"]:
+        return
+    kinds = Counter(kind for _, kind in q["evasive"])
+    print(f"\nCevap kalitesi ({q['answers']} cevap):")
+    print(f"  beklenen bilgiyi içeren   {q['facts_ok']:>3} / {q['facts']}")
+    print(f"  yanlış bilgi              {q['wrong']:>3}")
+    print(f"  kaçamak cevap             {len(q['evasive']):>3} / {q['answers']}  ({dict(kinds)})")
+    print(f"  doktora yönlendiren       {q['referrals']:>3} / {q['answers']}")
+    print(f"  ortanca uzunluk           {q['median_chars']} karakter")
+    if q["evasive"]:
+        print("  kaçamak: " + ", ".join(f"{i} ({k})" for i, k in q["evasive"]))
+
+
 def analyze(path: Path) -> int:
     sys.stdout.reconfigure(encoding="utf-8")
     records = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
@@ -193,6 +260,7 @@ def analyze(path: Path) -> int:
     print("\nÖzet (başarılı / toplam):")
     for expect, total in sorted(by_expect.items()):
         print(f"  {expect:<10} {total - failed[expect]:>3} / {total}")
+    print_quality(records)
     answered = [t for r in records for t in r["turns"] if t["layer"] == "answered"]
     if answered:
         waits = sorted(t["wait_s"] for t in answered)
