@@ -458,8 +458,8 @@ anahtar: \basi(lar|si|yi|ya|dan|lari|nin)?\b|asilan|otizm|kizamik|karma asi|hepa
 haric: hamile|gebe
 kaynak: Sağlık Bakanlığı; DSÖ
 Türkiye'de çocukluk aşıları Sağlık Bakanlığı takvimine göre aile sağlığı merkezlerinde ücretsiz yapılır.
-İlk aşı, doğumda yapılan Hepatit B aşısıdır. Karma aşılar 2., 4. ve 6. aylarda; kızamık-kızamıkçık-kabakulak
-(KKK) ve suçiçeği aşıları 12. ayda yapılır. Aşılar otizme neden olmaz; bu iddia büyük bilimsel
+İlk aşı, doğumda yapılan Hepatit B aşısıdır. Kızamık aşısı (kızamık-kızamıkçık-kabakulak, KKK) 12. ayda
+yapılır; suçiçeği aşısı da 12. ayda yapılır. Karma aşılar ise 2., 4. ve 6. aylarda yapılır. Aşılar otizme neden olmaz; bu iddia büyük bilimsel
 çalışmalarla çürütülmüştür. Aşıdan sonraki ilk 1–2 gün hafif ateş, huzursuzluk ve aşı yerinde kızarıklık
 beklenen, zararsız yan etkilerdir.
 

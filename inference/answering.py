@@ -120,6 +120,10 @@ def compare_age(age: Age, cards: Sequence[Card], question: str = "") -> list[str
                 verdict = "bu zaman henüz gelmedi"
             elif age.days > end + tolerance:
                 verdict = "bu zaman geçti"
+            elif high and age.days >= end - tolerance:
+                # "18 aylık, yürümüyor" ile "9–18 ay": aralığın içinde ama üst sınırında; model "tam dönemde"
+                # okuyunca "endişelenmeyin" diyordu (13.11.2026).
+                verdict = "aralığın üst sınırında; bu yaşa kadar olmadıysa değerlendirme önerilir"
             else:
                 verdict = "şu an tam bu dönemde"
             clause = _clause(card.text, m.start(), m.end())
@@ -148,7 +152,9 @@ def with_notes(question: str, cards: Sequence[Card], age: Age | None = None) -> 
         if comparisons:
             lines.append(
                 f"- Kullanıcının durumu: {_describe(age)}. Bu yaşın yukarıdaki zamanlarla karşılaştırması "
-                f"(hesaplandı, doğrudur; evet/hayır ve normal/değil kararını buna göre ver): " + "; ".join(comparisons) + "."
+                f"(hesaplandı, doğrudur; evet/hayır ve normal/değil kararını buna göre ver): " + "; ".join(comparisons) + ". "
+                "Bir becerinin zamanı henüz gelmediyse şu an olmaması normaldir (\"normal mi?\" sorusunun cevabı "
+                "evettir); zamanı geçtiyse ya da bir uyarı sınırına gelindiyse değerlendirme önerilir."
             )
     return f"[{NOTE_INTRO}\n" + "\n".join(lines) + f"]\n\nSoru: {question}"
 
