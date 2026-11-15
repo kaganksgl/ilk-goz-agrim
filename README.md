@@ -10,8 +10,6 @@ Anne adaylarına ve yeni annelere gebelik, doğum, emzirme ve bebek bakımı kon
 **tamamen bilgisayarınızda çalışan** Türkçe yapay zekâ asistanı. Sorularınız bilgisayarınızdan çıkmaz:
 bulut hizmeti, hesap, reklam ya da veri toplama yoktur.
 
-Adı, Türkçede insanların ilk çocukları için kullandığı *"ilk göz ağrım"* deyiminden gelir.
-
 ![İlk Göz Ağrım: "Bebeğim 5 aylık. Ek gıdaya başlayabilir miyim?" sorusu ve cevabı](docs/ekran-goruntuleri/2_cevap.png)
 
 > [!WARNING]
