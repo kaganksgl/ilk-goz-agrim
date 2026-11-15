@@ -98,3 +98,12 @@ def test_verify_without_file_does_not_download(small_model, monkeypatch):
 def test_real_constants_match_models_readme():
     readme = (dm.ROOT / "models" / "README.md").read_text(encoding="utf-8")
     assert dm.MODEL_SHA256 in readme and dm.MODEL_URL in readme
+
+
+def test_resumed_bytes_do_not_count_towards_speed(monkeypatch, capsys):
+    """Kaldığı yerden devam ederken önceden inmiş kısım hızı şişirmemeli ("819 MB/sn" yazıyordu)."""
+    clock = iter([0.0, 10.0])
+    monkeypatch.setattr(dm.time, "monotonic", lambda: next(clock))
+    report = dm._progress("İndiriliyor", 2000 * 1_048_576, already=1000 * 1_048_576)
+    report(1020 * 1_048_576, final=True)  # 10 saniyede 20 MB indi
+    assert "(2 MB/sn)" in capsys.readouterr().out

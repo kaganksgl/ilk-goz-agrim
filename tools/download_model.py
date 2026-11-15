@@ -42,7 +42,8 @@ def sha256_of(path: Path, report=None) -> str:
     return digest.hexdigest()
 
 
-def _progress(label: str, total: int):
+def _progress(label: str, total: int, already: int = 0):
+    """`already`: bu çalıştırmadan önce hazır olan bayt sayısı; hız hesabına katılmaz."""
     started = time.monotonic()
     last = [0.0]
 
@@ -52,7 +53,7 @@ def _progress(label: str, total: int):
             return
         last[0] = now
         percent = 100 * done / total if total else 0
-        speed = done / max(now - started, 1e-6) / 1_048_576
+        speed = max(done - already, 0) / max(now - started, 1e-6) / 1_048_576
         print(f"\r{label}: %{percent:5.1f}  {done / 1e9:.2f} / {total / 1e9:.2f} GB  ({speed:.0f} MB/sn)   ",
               end="\n" if final else "", flush=True)
 
@@ -90,7 +91,7 @@ def download(target: Path) -> None:
         with urllib.request.urlopen(request, timeout=60) as response:
             if have and response.status != 206:  # sunucu aralık isteğini yok saydı: baştan başla
                 have = 0
-            report = _progress("İndiriliyor", MODEL_BYTES)
+            report = _progress("İndiriliyor", MODEL_BYTES, already=have)
             with part.open("ab" if have else "wb") as handle:
                 done = have
                 while chunk := response.read(_CHUNK):
