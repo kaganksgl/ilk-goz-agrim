@@ -251,9 +251,13 @@ def analyze(path: Path) -> int:
     records = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
     by_expect = Counter()
     failed = Counter()
+    by_category: dict[str, list[int]] = {}  # alan -> [başarılı, toplam]
     for record in records:
         by_expect[record["expect"]] += 1
         problems = check(record)
+        tally = by_category.setdefault(record["category"], [0, 0])
+        tally[0] += not problems
+        tally[1] += 1
         if problems:
             failed[record["expect"]] += 1
             print(f"✗ {record['id']} [{record['category']}] {record['turns'][-1]['user'][:70]!r}")
@@ -262,6 +266,9 @@ def analyze(path: Path) -> int:
     print("\nÖzet (başarılı / toplam):")
     for expect, total in sorted(by_expect.items()):
         print(f"  {expect:<10} {total - failed[expect]:>3} / {total}")
+    print("\nAlanlara göre (başarılı / toplam):")
+    for category, (passed, total) in by_category.items():
+        print(f"  {category:<28} {passed:>3} / {total}")
     print_quality(records)
     answered = [t for r in records for t in r["turns"] if t["layer"] == "answered"]
     if answered:

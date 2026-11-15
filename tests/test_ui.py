@@ -139,10 +139,13 @@ def test_off_topic_question_is_refused_without_generation(qtbot, tmp_path, fake_
 
 def test_relevant_question_passes_history_to_guard(qtbot, tmp_path, fake_gguf):
     w, fake = ready_window(qtbot, tmp_path, fake_gguf)
-    ask(qtbot, w, "Bebeğim kaç saat uyumalı?")
+    ask(qtbot, w, "Anne olmak nasıl bir duygu?")  # kartı olmayan soru: konu kararını model verir
     check_messages = fake.choose_calls[0][0]
-    assert "Son mesaj: Bebeğim kaç saat uyumalı?" in check_messages[-1]["content"]
-    sent = fake.calls[0][0]
+    assert "Son mesaj: Anne olmak nasıl bir duygu?" in check_messages[-1]["content"]
+    w.new_conversation()
+    ask(qtbot, w, "Bebeğim kaç saat uyumalı?")
+    assert len(fake.choose_calls) == 1  # kartla eşleşen soru için konu denetimi modele sorulmaz
+    sent = fake.calls[-1][0]
     assert sent[0]["role"] == "system" and "ilk çocukları" in sent[0]["content"]
     # Soruya uyan bilgi kartı yalnızca modele giden son mesaja eklenir …
     assert sent[-1]["role"] == "user" and sent[-1]["content"].endswith("Soru: Bebeğim kaç saat uyumalı?")
@@ -436,4 +439,33 @@ def test_greeting_answer_to_real_question_is_regenerated_in_app(qtbot, tmp_path,
     ask(qtbot, w, "Bebeği banyoda yalnız bırakabilir miyim?")
     assert w.bubbles()[-1].text() == "Hayır, bebeği banyoda asla yalnız bırakmayın."
     assert len(fake.calls) == 2
+    w.close()
+
+
+# ---- demo sürümü ---------------------------------------------------------------
+def test_version_is_shown_in_header_and_settings(qtbot, tmp_path, fake_gguf):
+    from PySide6.QtWidgets import QLabel
+
+    from config.settings import APP_VERSION, MODEL_NAME
+
+    w, _ = ready_window(qtbot, tmp_path, fake_gguf)
+    assert any(APP_VERSION in label.text() for label in w.findChildren(QLabel, "appSubtitle"))
+    dialog = w.make_settings_dialog()
+    texts = [label.text() for label in dialog.findChildren(QLabel)]
+    assert f"{APP_VERSION} (demo)" in texts
+    assert any(MODEL_NAME in text and "fake.gguf" in text for text in texts)
+    w.close()
+
+
+def test_long_conversation_title_wraps_instead_of_scrolling_sideways(qtbot, tmp_path, fake_gguf):
+    from PySide6.QtCore import Qt
+
+    w, _ = ready_window(qtbot, tmp_path, fake_gguf)
+    w.show()
+    ask(qtbot, w, "Anne olmak nasıl bir duygu, ilk günlerde kendimi nasıl hazırlamalıyım, neler hissetmem normal?")
+    view = w.conversation_list
+    assert view.horizontalScrollBarPolicy() == Qt.ScrollBarAlwaysOff
+    rect = view.visualItemRect(view.item(0))
+    assert rect.width() <= view.viewport().width()
+    assert rect.height() > view.fontMetrics().height() * 1.5  # başlık birden çok satıra yayıldı
     w.close()

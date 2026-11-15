@@ -1,5 +1,11 @@
-# Arayüz (LGPL-3.0)
-PySide6==6.12.0
-# Yerel GGUF çıkarımı, llama.cpp bağlamaları (MIT)
-# Windows'ta derleyici gerektirmemek için hazır CPU tekerleği kullanılır, bkz. README.
+# Uygulamayı çalıştırmak için gerekenler (Windows, Python 3.12).
+# Arayüz (LGPL-3.0). Yalnızca QtCore/QtGui/QtWidgets kullanıldığı için "Essentials" paketi yeterlidir;
+# tam PySide6 paketindeki WebEngine vb. modüller (~500 MB) kurulmaz.
+PySide6-Essentials==6.12.0
+# Yerel GGUF çıkarımı, llama.cpp bağlamaları (MIT).
+# PyPI'da bu paketin yalnızca kaynak kodu vardır; derleyici gerektirmemek için projenin kendi yayımladığı
+# hazır CPU paketi (wheel) kullanılır. Kaynaktan derlemek isterseniz aşağıdaki iki satırı silin
+# (Visual Studio C++ derleme araçları ve CMake gerekir).
+--extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu
+--only-binary llama-cpp-python
 llama-cpp-python==0.3.36

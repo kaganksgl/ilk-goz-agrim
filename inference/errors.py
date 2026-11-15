@@ -49,7 +49,10 @@ class ModelLoadError(InferenceError):
 
 
 class ModelNotLoadedError(InferenceError):
-    user_message = "Model yüklenmediği için cevap üretilemiyor."
+    user_message = (
+        "Model yüklenmediği için cevap üretilemiyor. Model dosyası 'models' klasöründeyse "
+        "'Yeniden dene' düğmesine basın."
+    )
 
 
 class GenerationError(InferenceError):

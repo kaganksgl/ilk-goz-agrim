@@ -6,7 +6,7 @@ eşleşirse kartın metni cevap isteminin sonuna eklenir; model cevabını o bil
 düzenli ifadelerle yapılır: ikinci bir (gömme) modele gerek yoktur, sonuç belirlenimcidir ve test edilebilir.
 
 Kartlar [kartlar.md](kartlar.md) dosyasındadır; uzmanın okuyup düzeltebilmesi için düz metindir.
-**Kartlar taslaktır ve uzman onayı bekler** (CHECKLIST U7). İlaç dozu içermezler.
+**Kartlar taslaktır ve uzman onayı bekler**. İlaç dozu içermezler.
 """
 
 from __future__ import annotations
@@ -96,3 +96,16 @@ def find_cards(message: str, earlier: Sequence[str] = (), limit: int = MAX_CARDS
         if found:
             return found
     return []
+
+
+def has_direct_card(message: str, earlier: Sequence[str] = (), cards: Sequence[Card] | None = None) -> bool:
+    """Mesajın kendisi bir kartla eşleşiyor mu (önceki mesaja geri düşmeden)?
+
+    Konu denetimi bunu kullanır: bir kartın anahtar kelimesini taşıyan soru uygulamanın konusundadır. Önceki
+    mesajlar yalnızca kartın bağlam koşulu ("hamile") için kullanılır; kendisi eşleşmeyen bir mesaj ("Bana
+    kod yaz") önceki sorunun kartı sayesinde konuyla ilgili sayılmaz.
+    """
+    cards = load_cards() if cards is None else cards
+    query = fold(message)
+    context = " ".join([fold(m) for m in earlier[-_CONTEXT_MESSAGES:]] + [query])
+    return any(card.score(query, context) > 0 for card in cards)

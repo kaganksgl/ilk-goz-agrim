@@ -1,5 +1,6 @@
+# Geliştirme ve test için ek paketler.
 -r requirements.txt
 pytest==9.1.1
 pytest-qt==4.5.0
-# PDF künye/metin çıkarma (BSD-3-Clause); kaynak değerlendirmesi ve ileride bilgi tabanı için
+# PDF künye/metin çıkarma (BSD-3-Clause); yalnızca knowledge/ingest.py kullanır
 pypdf==6.1.1

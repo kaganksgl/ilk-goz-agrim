@@ -21,7 +21,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
 )
 
-from config.settings import ModelSettings
+from config.settings import APP_VERSION, MODEL_NAME, ModelSettings
 from ui.style import FONT_SCALES
 from ui.theme import THEME_CHOICES
 
@@ -69,10 +69,11 @@ class SettingsDialog(QDialog):
         self.delete_all_button.clicked.connect(self._on_delete_all)
         form.addRow("", self.delete_all_button)
 
-        model_label = QLabel(Path(model_path).name if model_path else "Yüklü model yok")
+        model_label = QLabel(f"{MODEL_NAME} ({Path(model_path).name})" if model_path else "Model yüklenmedi")
         model_label.setToolTip(model_path or "")
         model_label.setWordWrap(True)
         form.addRow("Model:", model_label)
+        form.addRow("Sürüm:", QLabel(f"{APP_VERSION} (demo)"))
         if data_dir is not None:
             data_label = QLabel(str(data_dir))
             data_label.setWordWrap(True)

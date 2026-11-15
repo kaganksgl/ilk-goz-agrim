@@ -1,4 +1,4 @@
-"""Model değerlendirmesi için ortak Türkçe veri (benchmark ve entegrasyon testleri kullanır)."""
+"""Konu denetimi ve cevap kalitesi için ortak Türkçe değerlendirme verisi (testler kullanır)."""
 
 from __future__ import annotations
 

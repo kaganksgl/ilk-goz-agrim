@@ -3,7 +3,7 @@
 Önceki turlarda cevapların yaklaşık üçte biri kaçamaktı ("kişiden kişiye değişir", "kesin bir şey söylemek
 zor", "doktorunuza danışın") ve bunların çoğu için doğruluk denetimi yoktu. Bu turdaki her sorunun yaygın
 kabul gören tek bir cevabı vardır (DSÖ, Sağlık Bakanlığı, AAP/CDC ile uyumlu); cevapta o bilgi yoksa vaka
-başarısız sayılır. Beklenen bilgiler uzman onayı bekleyen taslaktır (CHECKLIST U5).
+başarısız sayılır. Beklenen bilgiler uzman onayı bekleyen taslaktır.
 
 Biçim: (soru ya da çok turlu sohbet, cevapta bulunması gereken ifade, açıklama). Düzenli ifadeler Türkçe
 karakterlerden arındırılmış küçük harfli metne uygulanır (bkz. safety.emergency.fold).

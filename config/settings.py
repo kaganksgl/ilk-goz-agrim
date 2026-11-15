@@ -1,6 +1,6 @@
 """Uygulama ve model ayarları.
 
-Model yolu ve üretim parametreleri arayüz kodundan bağımsız olarak burada tutulur.
+Model dosyasının adı, üretim parametreleri ve talimatlar arayüz kodundan bağımsız olarak burada tutulur.
 Kullanıcı ayarları yerel cihazdaki bir JSON dosyasında saklanır; hiçbir yere gönderilmez.
 """
 
@@ -16,10 +16,12 @@ log = logging.getLogger(__name__)
 
 APP_NAME = "İlk Göz Ağrım"
 APP_ID = "IlkGozAgrim"
+# Demo sürümü: uzman onayı ve pilot çalışma tamamlanmadan 1.0 olmaz.
+APP_VERSION = "0.1.0"
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_MODEL_DIR = PROJECT_ROOT / "models"
-# Uygulama tek bir modelle geliştirilir ve test edilir (bkz. models/MODEL_SECIMI.md); talimatlar, güvenlik
+# Uygulama tek bir modelle geliştirilir ve test edilir; talimatlar, güvenlik
 # katmanları ve ölçümler bu modele göre ayarlıdır. Başka bir model seçilemez.
 MODEL_NAME = "Gemma 4 E4B"
 MODEL_FILENAME = "gemma-4-E4B_q4_0-it.gguf"

@@ -37,3 +37,39 @@ def test_guard_maps_label(fake_gguf, label, expected):
     model.load(fake_gguf, ModelSettings())
     assert TopicGuard(model).is_relevant([{"role": "user", "content": "soru"}]) is expected
     assert fake.choose_calls[0][1] == (RELEVANT, OFF_TOPIC)
+
+
+def _guard(fake_gguf, label=OFF_TOPIC, **kwargs):
+    fake = FakeLlama(topic=label)
+    model = LocalModel(lambda p, s: fake)
+    model.load(fake_gguf, ModelSettings())
+    return TopicGuard(model, **kwargs), fake
+
+
+@pytest.mark.parametrize("history", [
+    ["Nişan gelmesi ne demek?"],
+    ["Konak nedir?"],
+    ["Hamileyim, 34 haftalığım.", "Uçakla seyahat edebilir miyim?"],  # kartın bağlam koşulu önceki mesajda
+])
+def test_question_matching_a_card_is_relevant_without_asking_the_model(fake_gguf, history):
+    guard, fake = _guard(fake_gguf)
+    assert guard.is_relevant([{"role": "user", "content": text} for text in history]) is True
+    assert fake.choose_calls == []
+
+
+@pytest.mark.parametrize("history", [
+    ["Python'da bir listeyi nasıl sıralarım?"],
+    ["Uçakla seyahat ederken hangi koltuk daha rahat?"],  # gebelik bağlamı yok: kart eşleşmez
+    # Önceki soru bir kartla eşleşse de yeni mesajın kendisi eşleşmiyorsa model karar verir.
+    ["Bebeğime ne zaman bal verebilirim?", "Şimdi bana bir JavaScript fonksiyonu yaz."],
+])
+def test_message_without_its_own_card_is_still_classified_by_the_model(fake_gguf, history):
+    guard, fake = _guard(fake_gguf)
+    assert guard.is_relevant([{"role": "user", "content": text} for text in history]) is False
+    assert len(fake.choose_calls) == 1
+
+
+def test_card_shortcut_can_be_disabled(fake_gguf):
+    guard, fake = _guard(fake_gguf, trust_cards=False)
+    assert guard.is_relevant([{"role": "user", "content": "Konak nedir?"}]) is False
+    assert len(fake.choose_calls) == 1

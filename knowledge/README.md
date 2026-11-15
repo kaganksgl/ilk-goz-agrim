@@ -1,16 +1,21 @@
 # knowledge/
 
-Uygulamanın kaynaklara dayalı cevap verebilmesi (RAG) için bilgi tabanı.
+Uygulamanın cevaplarını dayandırdığı bilgiler bu klasördedir. İki ayrı bölüm vardır:
 
-**Durum (27 Ekim 2026):** Uygulama ücretsiz ve ticari olmayacak. 62 kaynak incelendi; 7'sinin lisansı
-doğrulandı (DSÖ CC BY-NC-SA 3.0 IGO ve NICHD). **Bilgi tabanı boş:** hiçbir kaynak henüz uzman onayı
-almadı. İnceleme kuyruğunda 4 pilot parça var.
+1. **Bilgi kartları (kullanımda):** [kartlar.md](kartlar.md) — sık sorulan, net cevabı olan 83 konuda kısa
+   notlar. Soru bir kartla eşleşirse ([cards.py](cards.py), düzenli ifadelerle) kart metni modele verilir ve
+   cevap ona dayanır. Kartlar özgün cümlelerle yazılmış **taslaklardır ve uzman onayı bekler**; ilaç dozu
+   içermezler.
+2. **Kaynak tabanı (hazırlık aşamasında, uygulama kullanmıyor):** lisansı doğrulanmış kaynaklardan alınan
+   parçalarla kaynak göstererek cevap verme (RAG) altyapısı. Aşağıdaki dosyalar ve kurallar bu bölüme aittir.
+
+**Kaynak tabanının durumu (27 Ekim 2026):** Uygulama ücretsiz ve ticari olmayacak. 62 kaynak incelendi;
+7'sinin lisansı doğrulandı (DSÖ CC BY-NC-SA 3.0 IGO ve NICHD). **Kaynak tabanı boş:** hiçbir kaynak henüz
+uzman onayı almadı. İnceleme kuyruğunda 4 pilot parça var.
 
 | Dosya | İçerik |
 |---|---|
-| [KAYNAK_DEGERLENDIRME_RAPORU.md](KAYNAK_DEGERLENDIRME_RAPORU.md) | Telif, güncellik, kapsam değerlendirmesi ve açık lisanslı ek kaynaklar |
-| [IZIN_BEKLEME_LISTESI.md](IZIN_BEKLEME_LISTESI.md) | Uzman incelemesi, izin ve teyit bekleyen kaynaklar |
-| [IZIN_TALEP_TASLAKLARI.md](IZIN_TALEP_TASLAKLARI.md) | Sağlık Bakanlığı, UNICEF ve CDC'ye başvuru taslakları |
+| [kartlar.md](kartlar.md), [cards.py](cards.py) | Bilgi kartları ve eşleştirme kodu (uygulamanın kullandığı tek içerik) |
 | [sources/registry.json](sources/registry.json) | Kaynak kaydı (istenen 16 alan + proje ekleri) ve `project_policy` |
 | [registry.py](registry.py) | Kayıt doğrulama, inceleme kuyruğu ve bilgi tabanına giriş denetimi |
 | [ingest.py](ingest.py) | Lisansı doğrulanmış PDF'lerden kuyruğa parça ekleme (bozuk metni reddeder) |

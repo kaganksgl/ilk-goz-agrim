@@ -1,6 +1,6 @@
 # Bilgi kartları
 
-> **TASLAK — uzman onayı bekliyor (CHECKLIST U7).** Bu kartlar bir doktor ya da ebe tarafından yazılmadı;
+> **TASLAK — uzman onayı bekliyor.** Bu kartlar bir doktor ya da ebe tarafından yazılmadı;
 > DSÖ, T.C. Sağlık Bakanlığı, AAP, CDC ve ACOG'un kamuya açık önerileriyle uyumlu olacak biçimde, özgün
 > cümlelerle hazırlandı (hiçbir kaynaktan metin kopyalanmadı). Pilot öncesinde her kartın bir uzman
 > tarafından okunup onaylanması ya da düzeltilmesi gerekir. Kartlarda ilaç dozu bulunmaz.
@@ -291,6 +291,16 @@ Yenidoğan bebek istediği her zaman emzirilir: genellikle 2–3 saatte bir, gü
 gösteren işaretler: ilk haftadan sonra günde en az 6 ıslak bez, düzenli kaka, emzirme sonrası sakinleşme ve
 kilo alımı. Bebekler ilk günlerde doğum kilosunun bir kısmını (en çok onda birini) kaybedebilir ve doğum
 kilosuna 10–14 gün içinde geri döner.
+
+## beslenme-miktari
+anahtar: ne kadar (sut|mama)|kac (ml|cc|olcek)[a-z ]{0,15}(sut|mama)|(sut|mama)\w* miktar
+haric: gebe|hamile|inek sut|sakla|dondur
+kaynak: DSÖ; AAP
+Bebeğin içeceği süt miktarı yaşına ve kilosuna göre değişir; herkese uyan tek bir rakam yoktur. Emzirilen
+bebekte miktar ölçülmez: bebek istediği her zaman emzirilir (yenidoğanda günde 8–12 kez) ve sütün yettiği
+günde en az 6 ıslak bez, düzenli kilo alımı ve emzirme sonrası sakinleşmeyle anlaşılır. Mamayla beslenen
+bebekte miktar, mama kutusundaki yaşa göre hazırlama tablosuna ve doktorun ya da ebenin önerisine göre
+ayarlanır; bebek doyduğunda biberonu bitirmesi için zorlanmaz.
 
 ## sagilmis-sut
 anahtar: sagilmis|sagdigim|sut\w*[a-z ]{0,30}(sakla|dayan|bekle|dondur|isit)|buzdolab|derin dondurucu|mikrodalga|cozulmus

@@ -4,12 +4,18 @@ Sistem talimatına konu sınırı yazmak tek başına yetmez; küçük modeller 
 Bu yüzden her mesaj, aynı yerel modelle ayrı ve kısıtlı bir sınıflandırma adımından geçer:
 model yalnızca ILGILI ya da ILGISIZ yazabilir. ILGISIZ ise cevap hiç üretilmez ve
 kullanıcıya sabit bir uyarı gösterilir.
+
+Model bazı halk deyişlerini ve terimleri tanımıyor: "Nişan gelmesi ne demek?", "Konak nedir?" ve gebenin
+uçak sorusu konu dışı sayılıyordu (13.11.2026). Bu yüzden mesajın kendisi bir bilgi kartıyla eşleşiyorsa
+(knowledge/cards.py) model sorulmadan konuyla ilgili kabul edilir. Büyük testteki 34 konu dışı ve 13 talimat
+aşma vakasının hiçbiri bir kartla eşleşmiyor; acil durum ve doz katmanları zaten bu adımdan önce çalışır.
 """
 
 from __future__ import annotations
 
 from config.settings import TOPIC_CHECK_PROMPT
 from inference.engine import LocalModel, Message
+from knowledge.cards import has_direct_card
 
 RELEVANT = "ILGILI"
 OFF_TOPIC = "ILGISIZ"
@@ -40,10 +46,15 @@ def build_check_messages(history: list[Message], context_messages: int = 4) -> l
 
 
 class TopicGuard:
-    def __init__(self, model: LocalModel, context_messages: int = 4):
+    def __init__(self, model: LocalModel, context_messages: int = 4, trust_cards: bool = True):
         self._model = model
         self._context_messages = context_messages
+        self._trust_cards = trust_cards
 
     def is_relevant(self, history: list[Message]) -> bool:
-        messages = build_check_messages(history, self._context_messages)
+        messages = build_check_messages(history, self._context_messages)  # son mesajı da doğrular
+        if self._trust_cards:
+            users = [m["content"] for m in history if m["role"] == "user"]
+            if has_direct_card(users[-1], users[:-1]):
+                return True
         return self._model.choose(messages, (RELEVANT, OFF_TOPIC)) == RELEVANT

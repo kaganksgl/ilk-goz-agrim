@@ -10,7 +10,7 @@ Tasarım ilkeleri:
 - **Klavye ve yazım toleransı:** Türkçe karakterler olmadan yazılan mesajlar da yakalanır
   ("bebegim nefes alamiyor").
 - **Uzman onayı:** Kural listesi bir taslaktır; kadın doğum ve çocuk sağlığı uzmanlarınca
-  onaylanmalıdır (bkz. safety/ACIL_DURUM_KURALLARI.md).
+  onaylanmalıdır.
 """
 
 from __future__ import annotations

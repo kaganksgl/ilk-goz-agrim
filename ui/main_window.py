@@ -24,7 +24,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from config.settings import APP_NAME, ModelSettings, save_settings
+from config.settings import APP_NAME, APP_VERSION, ModelSettings, save_settings
 from inference.engine import LocalModel
 from inference.errors import ModelNotConfiguredError, ModelNotLoadedError
 from inference.text_fixes import clean_answer
@@ -39,7 +39,7 @@ from ui.widgets import ChatInput, MessageBubble
 from ui.worker import InferenceWorker
 
 DISCLAIMER = (
-    "Bu uygulama bir prototiptir ve tıbbi tavsiye vermez. Cevaplar yapay zekâ tarafından "
+    "Bu uygulama bir demo sürümüdür ve tıbbi tavsiye vermez. Cevaplar yapay zekâ tarafından "
     "üretilir ve hatalı olabilir. Sağlığınız ve bebeğinizin sağlığıyla ilgili kararlar için "
     "mutlaka doktorunuza veya ebenize danışın. Acil durumlarda 112'yi arayın."
 )
@@ -148,7 +148,7 @@ class MainWindow(QMainWindow):
         titles = QVBoxLayout()
         title = QLabel(APP_NAME, objectName="appTitle")
         title.setAccessibleName("Uygulama adı: " + APP_NAME)
-        subtitle = QLabel("Gebelik ve çocuk gelişimi asistanı · çevrimdışı", objectName="appSubtitle")
+        subtitle = QLabel(f"Gebelik ve çocuk gelişimi asistanı · çevrimdışı · demo sürümü {APP_VERSION}", objectName="appSubtitle")
         titles.addWidget(title)
         titles.addWidget(subtitle)
         h.addLayout(titles)
@@ -181,6 +181,10 @@ class MainWindow(QMainWindow):
         self.conversation_list = QListWidget(objectName="conversationList")
         self.conversation_list.setAccessibleName("Geçmiş sohbetler")
         self.conversation_list.setWordWrap(True)
+        # Uzun başlık satıra sığmayınca yatay kaydırma çubuğu çıkıyor ve metin kırpılıyordu (15.11.2026):
+        # liste genişliğe göre yeniden dizilir, başlık alt satıra kayar.
+        self.conversation_list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.conversation_list.setResizeMode(QListWidget.Adjust)
         self.conversation_list.itemActivated.connect(self._on_conversation_activated)
         self.conversation_list.itemClicked.connect(self._on_conversation_activated)
         s.addWidget(self.conversation_list, 1)
@@ -573,7 +577,7 @@ class MainWindow(QMainWindow):
             return
         if self.state != "ready":
             # Model yokken asla uydurma bir cevap üretilmez.
-            self.show_notice(ModelNotLoadedError.user_message + " Önce bir model yükleyin.")
+            self.show_notice(ModelNotLoadedError.user_message)
             return
         self.input.clear()
         self.add_message("user", text)
