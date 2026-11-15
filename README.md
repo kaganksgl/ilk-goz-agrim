@@ -4,6 +4,7 @@
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%20%2F%2011-555555)
 ![Python](https://img.shields.io/badge/Python-3.12-3776ab)
 ![Çevrimdışı](https://img.shields.io/badge/%C3%A7al%C4%B1%C5%9Fma-tamamen%20%C3%A7evrimd%C4%B1%C5%9F%C4%B1-2e7d32)
+![Lisans](https://img.shields.io/badge/lisans-MIT-blue)
 
 Anne adaylarına ve yeni annelere gebelik, doğum, emzirme ve bebek bakımı konularında genel bilgi veren,
 **tamamen bilgisayarınızda çalışan** Türkçe yapay zekâ asistanı. Sorularınız bilgisayarınızdan çıkmaz:
@@ -208,7 +209,6 @@ Bu sürüm, uygulamayı denemek ve geri bildirim toplamak içindir. Bilinen eksi
 - **Pilot çalışma yapılmadı.** Gerçek kullanıcılarla, bir sağlık profesyonelinin gözetiminde yapılacak
   pilot çalışma planlanmıştır; KVKK, etik kurul ve tıbbi cihaz mevzuatı
   değerlendirmeleri henüz tamamlanmamıştır.
-- **Proje lisansı belirlenmedi** (bkz. [Lisans](#lisans)).
 
 ## Nasıl çalışır?
 
@@ -365,8 +365,12 @@ isterseniz aynı yoldan ulaşabilirsiniz.
 
 ## Lisans
 
-Bu deponun lisansı henüz belirlenmemiştir; bir lisans eklenene kadar tüm hakları saklıdır. Uygulama ücretsizdir
-ve ticari amaç taşımaz.
+Bu depodaki kod ve belgeler [MIT Lisansı](LICENSE) ile sunulur. Yazılım "olduğu gibi" sağlanır; hiçbir
+garanti verilmez.
 
-Kullanılan açık kaynaklı yazılımlar ve model kendi lisanslarına tabidir:
-[THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md). Model: Google Gemma 4 E4B (Apache-2.0).
+Lisansın kapsamı dışında kalanlar:
+
+- Kullanılan açık kaynaklı yazılımlar ve model kendi lisanslarına tabidir:
+  [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md). Model: Google Gemma 4 E4B (Apache-2.0).
+- `knowledge/pilot/` altındaki inceleme kuyruğunda Dünya Sağlık Örgütü yayınından alınmış parçalar bulunur;
+  bunlar CC BY-NC-SA 3.0 IGO lisansına tabidir (ticari kullanılamaz) ve uygulama tarafından kullanılmaz.
