@@ -45,4 +45,8 @@ dağıtılırsa Qt kütüphaneleri yine değiştirilebilir biçimde ayrı tutulm
 
 Bilgi kartları ([knowledge/kartlar.md](knowledge/kartlar.md)) özgün cümlelerle yazılmıştır; hiçbir kaynaktan metin
 kopyalanmamıştır. Kartların uyumlu olması hedeflenen öneriler (DSÖ, T.C. Sağlık Bakanlığı, AAP, CDC, ACOG) her
-kartın `kaynak:` satırında belirtilir.
+kartın `kaynak:` satırında belirtilir; bu, kurumların kartları onayladığı anlamına gelmez.
+
+`knowledge/pilot/review_queue.jsonl` dosyasındaki 4 parça Dünya Sağlık Örgütü yayınından değiştirilmeden
+alınmıştır ve CC BY-NC-SA 3.0 IGO lisansına tabidir (ticari kullanılamaz); uygulama bu parçaları kullanmaz.
+Atıf ve koşullar: [knowledge/pilot/LISANS.md](knowledge/pilot/LISANS.md).

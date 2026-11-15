@@ -374,3 +374,7 @@ Lisansın kapsamı dışında kalanlar:
   [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md). Model: Google Gemma 4 E4B (Apache-2.0).
 - `knowledge/pilot/` altındaki inceleme kuyruğunda Dünya Sağlık Örgütü yayınından alınmış parçalar bulunur;
   bunlar CC BY-NC-SA 3.0 IGO lisansına tabidir (ticari kullanılamaz) ve uygulama tarafından kullanılmaz.
+  Atıf ve koşullar: [knowledge/pilot/LISANS.md](knowledge/pilot/LISANS.md).
+
+Bu proje Google, Dünya Sağlık Örgütü, T.C. Sağlık Bakanlığı ya da adı geçen diğer kurumlarla bağlantılı
+değildir ve bu kurumlarca desteklenmemekte ya da onaylanmamaktadır.
