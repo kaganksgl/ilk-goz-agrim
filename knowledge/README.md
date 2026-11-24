@@ -2,15 +2,17 @@
 
 Uygulamanın cevaplarını dayandırdığı bilgiler bu klasördedir. İki ayrı bölüm vardır:
 
-1. **Bilgi kartları (kullanımda):** [kartlar.md](kartlar.md) — sık sorulan, net cevabı olan 83 konuda kısa
+1. **Bilgi kartları (kullanımda):** [kartlar.md](kartlar.md) — sık sorulan, net cevabı olan 91 konuda kısa
    notlar. Soru bir kartla eşleşirse ([cards.py](cards.py), düzenli ifadelerle) kart metni modele verilir ve
    cevap ona dayanır. Kartlar özgün cümlelerle yazılmış **taslaklardır ve uzman onayı bekler**; ilaç dozu
    içermezler.
 2. **Kaynak tabanı (hazırlık aşamasında, uygulama kullanmıyor):** lisansı doğrulanmış kaynaklardan alınan
    parçalarla kaynak göstererek cevap verme (RAG) altyapısı. Aşağıdaki dosyalar ve kurallar bu bölüme aittir.
 
-**Kaynak tabanının durumu (27 Ekim 2026):** Uygulama ücretsiz ve ticari olmayacak. 62 kaynak incelendi;
-7'sinin lisansı doğrulandı (DSÖ CC BY-NC-SA 3.0 IGO ve NICHD). **Kaynak tabanı boş:** hiçbir kaynak henüz
+**Kaynak tabanının durumu (24 Kasım 2026):** Uygulama ücretsiz ve ticari olmayacak. 84 kaynak incelendi;
+9'unun lisansı doğrulandı (DSÖ CC BY-NC-SA 3.0 IGO, NICHD ve açık lisanslı iki makale: CC BY 4.0, CC BY-NC 4.0).
+24 Kasım'da 22 Türkçe derleme makalesi ve bir hastane rehberi eklendi (`MAK-*`, `ANK-001`); çoğunun
+PDF'inde lisans beyanı yoktur. **Kaynak tabanı boş:** hiçbir kaynak henüz
 uzman onayı almadı. İnceleme kuyruğunda 4 pilot parça var.
 
 | Dosya | İçerik |
@@ -49,7 +51,8 @@ kaynak kaydı ──(lisans kaynağın beyanıyla doğrulandı)──▶ incelem
 .venv\Scripts\python -m knowledge.ingest WHO-001 rehber.pdf --topic 8   # kuyruğa parça ekle
 ```
 
-Kaynak PDF'leri depoya eklenmez; `original_url` alanından indirilebilir.
+Kaynak PDF'leri depoya eklenmez; `original_url` alanından indirilebilir. İncelenen PDF'lerin dosya adları
+her kaydın `local_file_names` alanında yazılıdır; dosyaların kendisi proje dışında saklanır.
 
 ## Parça biçimi (satır başına bir JSON)
 

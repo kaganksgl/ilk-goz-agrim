@@ -72,7 +72,7 @@ def test_project_is_non_commercial():
 
 def test_real_registry_is_valid_and_complete():
     assert validate(RECORDS, COMMERCIAL) == []
-    assert len(RECORDS) == 62
+    assert len(RECORDS) == 84
     for record in RECORDS:
         assert all(field in record for field in REQUIRED_FIELDS)
 
@@ -84,7 +84,7 @@ def test_nothing_is_approved_without_expert_review():
 
 def test_license_verified_sources_are_exactly_the_open_ones():
     verified = sorted(r["source_id"] for r in RECORDS if license_verified(r, COMMERCIAL))
-    assert verified == ["NIH-001", "WHO-001", "WHO-002", "WHO-003", "WHO-004", "WHO-005", "WHO-006"]
+    assert verified == ["MAK-001", "MAK-002", "NIH-001", "WHO-001","WHO-002", "WHO-003", "WHO-004", "WHO-005", "WHO-006"]
     for sid in verified:
         assert BY_ID[sid]["inclusion_status"] == "uzman_incelemesi_bekliyor"
 

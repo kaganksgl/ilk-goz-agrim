@@ -61,6 +61,24 @@ def test_parse_reads_fields_and_joins_text():
     ("bebek sirt ustu mu yatirilir yuzustu mu", "guvenli-uyku"),
     ("Yenidoğan sarılığı nedir?", "sarilik"),
     ("Bebeğimi dışarı çıkarmak için 40 gün beklemem şart mı?", "disari-cikarma"),
+    # 24.11.2026: makale kaynaklarıyla eklenen kartlar
+    ("Hamileyken papatya çayı içebilir miyim?", "gebelikte-bitkisel-urunler"),
+    ("Hamileyim, aktardan aldığım karışımı kullanabilir miyim?", "gebelikte-bitkisel-urunler"),
+    ("Hamileyken sivilce kremi kullanabilir miyim?", "gebelikte-cilt-urunleri"),
+    ("Hamilelikte retinol kullanılır mı?", "gebelikte-cilt-urunleri"),
+    ("Hamileyim belim çok ağrıyor", "gebelikte-bel-agrisi"),
+    ("28 haftalık gebeyim, kasık ağrısı normal mi?", "gebelikte-bel-agrisi"),
+    ("Hamileyken çok kaygılıyım, bebeğime bir şey olacak diye korkuyorum", "gebelikte-kaygi-ve-depresyon"),
+    ("Hamileyim ve antidepresan kullanıyorum, bırakmalı mıyım?", "gebelikte-kaygi-ve-depresyon"),
+    ("Doğumdan çok korkuyorum", "dogum-korkusu"),
+    ("Doğumum çok kötü geçti, sürekli aklıma geliyor", "dogum-korkusu"),
+    ("Ten tene temas nedir?", "ten-tene-temas"),
+    ("Aşı olurken bebeğimin ağrısını nasıl azaltırım?", "ten-tene-temas"),
+    ("Babalar gebelik sürecinde anneye nasıl destek olabilir?", "baba-katilimi"),
+    ("Eşim bebek bakımında yardım etmiyor, kendimi yalnız hissediyorum", "baba-katilimi"),
+    ("Baba olarak bebeğimle nasıl bağ kurabilirim?", "baglanma"),
+    ("Bebeğime bağlanamıyorum gibi hissediyorum, bu normal mi?", "baglanma"),
+    ("Emziremediğim için kötü bir anne miyim?", "baglanma"),
 ])
 def test_question_finds_its_card(question, card):
     assert card in ids(question)
@@ -75,6 +93,11 @@ def test_question_finds_its_card(question, card):
     "Doğum sonrası işe dönmeye nasıl hazırlanırım?",  # 'dönme' gelişim basamağı değil
     "1 yaşındaki çocuğuma öksürük şurubu verebilir miyim?",  # 'şurubu ver' ≠ 'su ver'
     "Son olarak, bu konuştuklarımızı kısaca özetler misin?",
+    "Babamın şekeri yüksek, ne yemeli?",  # 'baba' kartı değil
+    "Eşimle tartıştık, boşanma davası nasıl açılır?",  # 'davası' içindeki 'ası' aşı değil
+    "Doğum sonrası ağrı kesici olarak ne kadar ibuprofen alabilirim?",  # 'sonrası' aşı değil
+    "Sırt ağrım var ne yapmalıyım?",  # gebelik bağlamı yok
+    "Aklıma takıldı, yarın kar yağacak mı?",  # 'aklıma' klima değil
 ])
 def test_unrelated_questions_get_no_card(question):
     assert ids(question) == []

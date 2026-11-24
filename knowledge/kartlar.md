@@ -4,6 +4,9 @@
 > DSÖ, T.C. Sağlık Bakanlığı, AAP, CDC ve ACOG'un kamuya açık önerileriyle uyumlu olacak biçimde, özgün
 > cümlelerle hazırlandı (hiçbir kaynaktan metin kopyalanmadı). Pilot öncesinde her kartın bir uzman
 > tarafından okunup onaylanması ya da düzeltilmesi gerekir. Kartlarda ilaç dozu bulunmaz.
+> `kaynak:` satırında `arka plan:` ile anılan derleme makaleleri (`MAK-*`, bkz.
+> [sources/registry.json](sources/registry.json)) yalnızca arka plan bilgisi olarak okunmuştur; bu
+> makalelerden de metin alınmamıştır.
 
 Biçim (bkz. [cards.py](cards.py)): her kart `## kimlik` ile başlar. `anahtar:` satırları soruda aranan
 düzenli ifadelerdir (Türkçe karakterlerden arındırılmış küçük harfli metne uygulanır; biri eşleşirse kart
@@ -199,6 +202,55 @@ Gebelikte kediyi evden uzaklaştırmak gerekmez. Toksoplazma kedinin dışkısı
 kabını mümkünse başka biri temizlemelidir; siz temizleyecekseniz eldiven takın ve sonra ellerinizi yıkayın.
 Toksoplazma daha çok çiğ ya da az pişmiş etten ve iyi yıkanmamış sebze-meyveden bulaşır.
 
+## gebelikte-bitkisel-urunler
+anahtar: bitki\w*|kantaron|meyan|zerdecal|zencefil|ekinezya|kedi ?otu|dogal (urun|ilac|tedavi)|\baktar
+anahtar: (papatya|rezene|ada ?cay|ihlamur|kusburnu|nane|kekik|yesil cay|melisa|biberiye)\w*
+baglam: gebe|hamile|emzir
+kaynak: ACOG; NHS; arka plan: MAK-015, MAK-016
+Bitkisel ürünler "doğal" oldukları için gebelikte kendiliğinden güvenli değildir: çoğunun gebelikteki
+güvenliği araştırılmamıştır ve bazıları kullanılan ilaçlarla etkileşir. Sarı kantaron, meyan kökü ve
+yüksek miktarda zerdeçal gibi ürünlerin gebelikte zararlı olabileceğine dair bulgular vardır. Bulantıya
+zencefilin iyi geldiğine dair kanıt vardır; başka bir bitkinin gebelikte yararı gösterilmemiştir. Gebelikte
+ve emzirirken bitki çayı, bitkisel kapsül, aktar karışımı ya da bitkisel yağ kullanmadan önce doktora ya da
+eczacıya danışılmalıdır.
+
+## gebelikte-cilt-urunleri
+anahtar: akne|sivilce|retinol|retinoid|tretinoin|izotretinoin|isotretinoin|roaccutane|kozmetik|cilt (bakim|urun|krem)|catlak|leke kremi
+baglam: gebe|hamile|emzir
+haric: meme|pisik|\bdudak
+kaynak: ACOG; AAD; arka plan: MAK-016, MAK-017
+Sivilce (akne) tedavisinde hap olarak kullanılan izotretinoin gebelikte kesinlikle kullanılmaz; ağır doğum
+kusurlarına yol açar. Bu ilacı kullanan kadınlar gebe kalmamak için korunmalıdır; ilaç kullanılırken gebe
+kalındığı fark edilirse ilaç hemen bırakılıp doktora başvurulmalıdır. Retinol, retinoid ya da tretinoin
+içeren kremler de gebelikte önerilmez; emzirirken doktora danışılmalıdır. Çatlakları kesin olarak önlediği
+kanıtlanmış bir krem ya da yağ yoktur; çatlakların çoğu doğumdan sonra zamanla solar. Yeni bir cilt ürününün
+içeriği doktora ya da eczacıya sorulmalıdır.
+
+## gebelikte-bel-agrisi
+anahtar: \b(bel|belim\w*|belin\w*|sirt\w*|kalca\w*|kasik\w*|bilek\w*|legen\w*|kuyruk sokum\w*)[a-z ]{0,12}\bagri|pelvik|\bel(ler|lerim)?\w*[a-z ]{0,8}uyus
+baglam: gebe|hamile|\d+\.? ?hafta
+kaynak: ACOG; NHS; arka plan: MAK-014
+Gebelikte bel ağrısı çok yaygındır; bel, sırt, kalça ve kasık ağrısı en sık görülen kas-iskelet
+yakınmalarıdır. Bel ve leğen kemiği çevresindeki ağrı çoğunlukla 18. hafta civarında başlar, 24–36.
+haftalar arasında artar ve çoğu kadında doğumdan sonraki birkaç ay içinde geçer. Hafif ve düzenli egzersiz
+(yürüyüş, yüzme, gebelere uygun esneme), dik duruş, ağır kaldırmamak, alçak topuklu ayakkabı ve yan
+yatarken bacak arasına yastık koymak rahatlatır. Ağrı çok şiddetliyse, ateş, idrarda yanma ya da bacaklarda
+uyuşma eşlik ediyorsa ya da düzenli aralıklarla gelip giden bel veya karın ağrısı varsa beklemeden doktora
+başvurulmalıdır.
+
+## gebelikte-kaygi-ve-depresyon
+anahtar: (gebe|hamile)\w*[a-z ]{0,40}(kaygi|endise|anksiyete|depresyon|mutsuz|aglamakli|moral|panik)
+anahtar: (kaygi|endise|anksiyete|mutsuz|panik)\w*[a-z ]{0,30}(gebe|hamile)
+anahtar: antidepresan|psikiyatri\w* ilac|ruh\w* (saglig|ilac|hastalig)|psikolojik destek
+baglam: gebe|hamile|emzir|dogum
+kaynak: DSÖ; ACOG; arka plan: MAK-004, MAK-005
+Gebelikte kaygı ve depresyon da görülür; bunlar yalnızca doğumdan sonra ortaya çıkmaz. Bebeğin sağlığı için
+ara sıra endişelenmek normaldir. Kaygı ya da mutsuzluk iki haftadan uzun sürüyorsa, uykuyu, iştahı ve
+günlük işleri belirgin biçimde etkiliyorsa ya da eskiden zevk alınan şeyler artık keyif vermiyorsa bu
+doktora ya da ebeye söylenmelidir; gebelikte de tedavi edilebilir. Daha önce ruhsal bir rahatsızlık
+geçirenlerde bu dönemde yineleme riski artar. Ruh sağlığı için ilaç kullanan kadınlar gebe kaldıklarında
+ilacı kendi kendilerine bırakmamalı, hemen doktorlarıyla konuşmalıdır.
+
 ## dogumun-baslamasi
 anahtar: dogum\w* basla|sanci|kasilma|braxton|nisan gel|su(yum|yun|larim)?\w* gel
 haric: \bgaz|kolik
@@ -250,7 +302,18 @@ Doğum sonrası hüzün annelerin çoğunda görülür: ilk günlerde başlayan 
 genellikle 2 hafta içinde kendiliğinden geçer. Belirtiler 2 haftadan uzun sürerse, şiddetliyse ya da günlük
 işleri ve bebeğin bakımını engelliyorsa doğum sonrası depresyon olabilir; bu tedavi edilebilir bir
 durumdur ve doktora başvurulmalıdır. Kendine ya da bebeğe zarar verme düşünceleri olursa hemen yardım
-istenmelidir.
+istenmelidir. Doğumdan sonraki ilk haftalarda olmayan sesler duyma, gerçek olmayan şeylere inanma ya da
+ani karmaşa (doğum sonrası psikoz) nadirdir ama acil bir durumdur; hemen 112 aranmalıdır.
+
+## dogum-korkusu
+anahtar: dogum\w*[a-z ]{0,30}(kork|endise|kaygi|travma|kotu gec|kabus)|kork\w*[a-z ]{0,20}dogum
+kaynak: DSÖ; NHS; arka plan: MAK-012, MAK-004
+Doğum korkusu çok yaygındır, özellikle ilk gebelikte. Doğuma hazırlık sınıflarına katılmak, doğumun nasıl
+ilerlediğini öğrenmek, ağrıyla baş etme seçeneklerini (nefes, hareket, epidural) önceden doktor ya da
+ebeyle konuşmak ve doğumda yanınızda olacak bir destekçi belirlemek korkuyu azaltır. Korku uykuyu ya da
+günlük yaşamı çok etkiliyorsa gebelik kontrolünde söyleyin; psikolojik destek alınabilir. Doğumu kötü
+yaşayan bir anne doğumu tekrar tekrar zihninde yaşayabilir, kâbus görebilir ya da sürekli tetikte
+hissedebilir; bu geçmiyorsa ya da bebekle bağ kurmayı zorlaştırıyorsa destek almak iyileşmeyi kolaylaştırır.
 
 ## sac-dokulmesi
 anahtar: sac\w* dokul
@@ -329,10 +392,12 @@ söylenen çay ve ürünlerin etkisi kanıtlanmamıştır.
 
 ## emzik
 anahtar: emzik
-kaynak: AAP
+kaynak: AAP; arka plan: MAK-009
 Emzirilen bebeklerde emziğe, emzirme iyice oturduktan sonra (genellikle 3–4. haftadan sonra) başlanması
-önerilir. Emzik uykuya dalarken kullanılabilir. Emziğin ipi, zinciri ya da boyna asılan askısı olmamalıdır;
-boğulma riski taşır. Emziğe bal, pekmez ya da şeker sürülmez.
+önerilir. Uykuya dalarken verilen emzik ani bebek ölümü riskini azaltabilir; bebek uyurken emziği
+düşürürse yeniden takmak gerekmez ve emzik zorla verilmez. Uzun süreli ve sık kullanım orta kulak
+iltihabı riskini ve ileride diş dizilimi sorunlarını artırabilir. Emziğin ipi, zinciri ya da boyna asılan
+askısı olmamalıdır; boğulma riski taşır. Emziğe bal, pekmez ya da şeker sürülmez.
 
 ## emziren-anne
 anahtar: emzir\w*[a-z ]{0,30}(diyet|kilo ver|zayifla|beslen)|emziren anne
@@ -343,10 +408,11 @@ Bol su içilir; alkol ve sigaradan kaçınılır.
 
 ## gece-emzirme
 anahtar: gece emzir|gece beslen
-kaynak: DSÖ; AAP
-Gece emzirmeleri ilk 6 ayda bebeğin büyümesi ve süt üretimi için gereklidir. 6 aydan sonra, ek gıdaya
-geçmiş ve kilo alımı iyi olan birçok bebek gece beslenmeden daha uzun uyuyabilir; gece emzirmeleri bebek
-hazır oldukça yavaş yavaş azaltılabilir. Bunun için kesin bir yaş sınırı yoktur.
+kaynak: DSÖ; AAP; arka plan: MAK-001
+Gece emzirmeleri ilk 6 ayda bebeğin büyümesi ve süt üretimi için gereklidir. Gece sütünün içeriği gündüz
+sütünden farklıdır ve bebeğin gece ile gündüzü ayırt etmeyi öğrenmesine yardımcı olabilir. 6 aydan sonra,
+ek gıdaya geçmiş ve kilo alımı iyi olan birçok bebek gece beslenmeden daha uzun uyuyabilir; gece
+emzirmeleri bebek hazır oldukça yavaş yavaş azaltılabilir. Bunun için kesin bir yaş sınırı yoktur.
 
 ## ek-gida
 anahtar: ek gida|tamamlayici beslenme|kati gida|kac ogun|ne yedir|ilk besin|yogurt
@@ -563,7 +629,7 @@ koltuğa arkaya dönük bebek koltuğu kesinlikle takılmaz; hava yastığı öl
 arkaya dönük oturtulur. Mama sandalyesi, puset ve ana kucağında da emniyet kemeri her zaman takılır.
 
 ## isitici
-anahtar: isitici|\bsoba|klima
+anahtar: isitici|\bsoba|\bklima
 kaynak: AAP
 Bebek odasında elektrikli ısıtıcı kullanılacaksa bebeğin yatağından ve perdelerden uzak, devrilmeyecek bir
 yere konmalı, üzeri örtülmemeli ve gece boyunca gözetimsiz açık bırakılmamalıdır. Oda sıcaklığı 20–22 °C'yi
@@ -690,3 +756,35 @@ Göğüs pompası kullanmadan önce eller yıkanır ve pompanın parçaları tem
 yerleştirilir; meme ucu tünelde sürtünmeden rahatça hareket etmelidir. Düşük emiş gücüyle başlanır, acıtmayacak
 kadar artırılır; her memeden yaklaşık 15–20 dakika ya da süt akışı azalana kadar sağılır. Pompa acıtıyorsa
 huni boyu ya da emiş gücü uygun değildir. Kullanımdan sonra parçalar sıcak sabunlu suyla yıkanıp kurutulur.
+
+## ten-tene-temas
+anahtar: ten ?tene|kanguru bakim|dogum\w* sonra\w*[a-z ]{0,20}(gogs|kucag)|ilk saat\w*[a-z ]{0,25}(emzir|bebe)
+anahtar: \b(asi|topuk kan|igne|kan al)\w*[a-z ]{0,30}\b(agri|aglama|acimasin|aci\b|acir)
+kaynak: DSÖ; AAP; arka plan: MAK-002, MAK-010, MAK-011
+Ten tene temas, bebeğin çıplak olarak annenin (ya da babanın) çıplak göğsüne yatırılıp üzerinin
+örtülmesidir. Sağlıklı bebeklerde doğumdan hemen sonra başlanması ve en az bir saat kesintisiz
+sürdürülmesi önerilir; sezaryenle doğumda da çoğu zaman mümkündür. Bebeğin vücut ısısını korur, ağlamayı
+azaltır, kalp atışını ve solunumunu düzenler, emzirmeyi kolaylaştırır ve bağlanmayı destekler. İlk
+emzirmeye ilk saat içinde başlanması önerilir. Aşı ya da topuk kanı gibi iğneli işlemler sırasında bebeği
+emzirmek ya da ten tene tutmak ağrısını azaltır.
+
+## baba-katilimi
+anahtar: \bbaba(lar|nin|ya|yla|lik|ligi|si)?\b[a-z ]{0,40}(destek|katil|\bbag|yardim|\brol|ne yap|nasil)|baba aday|babalik
+anahtar: \bes(im|imin|imle|im de)\b[a-z ]{0,40}(destek|yardim|ilgilen|katil|yalniz)
+kaynak: DSÖ; UNICEF; arka plan: MAK-003, MAK-011
+Babanın gebelik ve doğuma katılımı anneyi bedensel ve duygusal olarak destekler, doğum deneyimini
+olumlu etkiler ve doğum sonrası depresyon riskini azaltabilir. Baba gebelik kontrollerine ve doğuma hazırlık
+sınıflarına katılabilir, doğumda annenin yanında olabilir. Bebeği kucaklamak, ten tene tutmak, altını
+değiştirmek, yıkamak, onunla konuşmak ve göz teması kurmak babanın bebekle bağ kurmasını sağlar; anneyi
+dinlendirmek emzirmeyi de destekler. Bakım işlerini açıkça konuşup paylaşmak iki ebeveyni de rahatlatır.
+Babalarda da doğum sonrası depresyon görülebilir.
+
+## baglanma
+anahtar: baglan(ama|amiyor|amadim|mak|ma)\w*|bag kur|kotu (bir )?anne|bebe\w*[a-z ]{0,25}(sevemiyorum|sevgi hissetmiyorum|bir sey hissetmiyorum|yabanci)
+kaynak: DSÖ; NHS; arka plan: MAK-011, MAK-012, MAK-013
+Bebeğe bağlanma zamanla gelişen bir süreçtir; doğumdan hemen sonra yoğun bir sevgi hissetmemek sık
+görülür ve kötü bir anne olduğunuz anlamına gelmez. Zor geçen bir doğum, ağrı, yorgunluk ve uykusuzluk bu
+duyguyu geciktirebilir. Ten tene temas, bebeği sık kucağa almak, göz teması kurmak, yumuşak bir sesle
+konuşmak ve ağladığında yanıt vermek bağı güçlendirir; emzirmeyen anneler de bebekleriyle güçlü bağ kurar.
+Bu his haftalar içinde düzelmiyorsa ya da sürekli üzüntü ve umutsuzluk eşlik ediyorsa ebe, hemşire ya da
+doktorla konuşmak önemlidir; destekle düzelir.
